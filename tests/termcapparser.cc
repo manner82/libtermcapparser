@@ -1,0 +1,268 @@
+#include <gtest/gtest.h>
+
+#include <putty/termcapparser.hh>
+
+using namespace Putty;
+
+TEST(TestTermcapParser, Initialize)
+{
+  // Initial size of the parser should be 80x24
+  TermcapParser parser("UTF-8");
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(80, state.get_width());
+  ASSERT_EQ(24, state.get_height());
+
+  // Each cell should be filled with spaces initially:
+  //   character = 0x20
+  //   attribute = default bg and default fg
+  for (int row = -100; row < state.get_height(); ++row)
+    {
+      for (unsigned col = 0; col < state.get_height(); ++col)
+        {
+          const Cell &cell = state.get_cell(row, col);
+
+          // Check character
+          ASSERT_EQ(0x20, cell.get_characters()[0]) << "Cell character not a space in row " << row << " col " << col;
+
+          // Check other valid attributes
+          ASSERT_EQ(0, cell.get_attributes() & Cell::FlagMask);
+          ASSERT_EQ(256, cell.foreground_code());
+          ASSERT_EQ(258, cell.background_code());
+        }
+    }
+}
+
+TEST(TestTermcapParser, InputData)
+{
+  const char testdata[] = "A\033[31mB\033[42mC\033[0mD";
+  TermcapParser parser("UTF-8");
+  parser.data_input(testdata, sizeof(testdata));
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"A", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"B", state.get_cell(0, 1).get_characters());
+  ASSERT_EQ(L"C", state.get_cell(0, 2).get_characters());
+  ASSERT_EQ(L"D", state.get_cell(0, 3).get_characters());
+
+  ASSERT_EQ(256, state.get_cell(0, 0).foreground_code());
+  ASSERT_EQ(258, state.get_cell(0, 0).background_code());
+
+  ASSERT_EQ(1, state.get_cell(0, 1).foreground_code());
+  ASSERT_EQ(258, state.get_cell(0, 1).background_code());
+
+  ASSERT_EQ(1, state.get_cell(0, 2).foreground_code());
+  ASSERT_EQ(2, state.get_cell(0, 2).background_code());
+
+  ASSERT_EQ(256, state.get_cell(0, 3).foreground_code());
+  ASSERT_EQ(258, state.get_cell(0, 3).background_code());
+}
+
+TEST(TestTermcapParser, Resize)
+{
+  TermcapParser parser("UTF-8");
+  parser.set_terminal_size(100, 100);
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(100, state.get_width());
+  ASSERT_EQ(100, state.get_height());
+}
+
+/**
+ * Some character-encoding sanity tests.
+ */
+TEST(TestTermcapParser, EncodingUTF8)
+{
+  TermcapParser parser("UTF-8");
+  // Euro sign in utf-8
+  parser.data_input("\xE2\x82\xAC", 3);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0).get_characters()[0]);
+
+  // Another euro sign in three steps
+  parser.data_input("\xE2", 1);
+  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1).get_characters());
+  parser.data_input("\x82", 1);
+  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1).get_characters());
+  parser.data_input("\xAC", 1);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 1).get_characters()[0]);
+}
+
+TEST(TestTermcapParser, EncodingLatin2)
+{
+  TermcapParser parser("iso-8859-2");
+  parser.data_input("\xd0", 1);
+  ASSERT_EQ(0x110, parser.get_state().get_cell(0, 0).get_characters()[0]);
+}
+
+TEST(TestTermcapParser, EncodingLatin15)
+{
+  TermcapParser parser("iso-8859-15");
+  // Euro sign in iso-8859-15
+  parser.data_input("\xa4", 1);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0).get_characters()[0]);
+}
+
+/**
+ * Ensure proper Putty configuration.
+ */
+TEST(TestTermcapParser, ColorConfiguration)
+{
+  static const char ansi_color_input[] = "\033[31;42mA";
+  static const char xterm256_color_input[] = "\033[38;5;126;48;5;127mA";
+  TermcapParser parser("UTF-8");
+
+  // Check ANSI color
+  parser.data_input(ansi_color_input, sizeof(ansi_color_input) - 1);
+  ASSERT_EQ(1, parser.get_state().get_cell(0, 0).foreground_code());
+  ASSERT_EQ(2, parser.get_state().get_cell(0, 0).background_code());
+
+  // Check xterm 256 color
+  parser.data_input(xterm256_color_input, sizeof(xterm256_color_input) - 1);
+  ASSERT_EQ(126, parser.get_state().get_cell(0, 1).foreground_code());
+  ASSERT_EQ(127, parser.get_state().get_cell(0, 1).background_code());
+}
+
+TEST(TestTermcapParser, BceConfiguration)
+{
+  static const char input[] = "\033[31mabc\033[Kdef";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+  ASSERT_EQ(1, parser.get_state().get_cell(0, 35).foreground_code());
+}
+
+TEST(TestTermcapParser, LFhasCRConfiguration)
+{
+  static const char input[] = "a\nb";
+  TermcapParser parser_nolf("UTF-8");
+
+  parser_nolf.data_input(input, sizeof(input) - 1);
+  ASSERT_EQ(L"a", parser_nolf.get_state().get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"b", parser_nolf.get_state().get_cell(1, 1).get_characters());
+
+  TermcapParser parser_lfcr("UTF-8");
+  parser_lfcr.replace_standalone_linefeeds(true);
+  parser_lfcr.data_input(input, sizeof(input) - 1);
+  ASSERT_EQ(L"a", parser_lfcr.get_state().get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"b", parser_lfcr.get_state().get_cell(1, 0).get_characters());
+}
+
+/**
+ * Test device control string filter
+ */
+TEST(TestTermcapParser, FilterControl)
+{
+  static const char input[] = "abc\033P+q1234d\033P+q1234ef";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  char data[7];
+  for (unsigned col = 0; col < 6; ++col)
+    data[col] = (char)parser.get_state().get_cell(0, col).get_characters()[0];
+  data[6] = '\0';
+
+  ASSERT_STREQ("abcdef", data);
+}
+
+/**
+ * Buffering tests
+ */
+TEST(TestTermcapParser, Buffer)
+{
+  static const char input[] = "a\r\nb\r\nc";
+  TermcapParser parser("UTF-8");
+  parser.set_terminal_size(50, 2);
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ(1, parser.get_state().get_buffer_size());
+  ASSERT_EQ(L"c", parser.get_state().get_cell(1, 0).get_characters());
+  ASSERT_EQ(L"b", parser.get_state().get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"a", parser.get_state().get_cell(-1, 0).get_characters());
+}
+
+TEST(TestTermcapParser, ClearBuffer)
+{
+  static const char input[] = "a\r\nb\r\nc";
+  TermcapParser parser("UTF-8");
+  parser.set_terminal_size(50, 1);
+
+  parser.data_input(input, sizeof(input) - 1);
+  parser.clear_buffer();
+
+  ASSERT_EQ(0, parser.get_state().get_buffer_size());
+  ASSERT_EQ(L"c", parser.get_state().get_cell(0, 0).get_characters());
+}
+
+/**
+ * Line attribute tests
+ */
+TEST(TestTermcapParser, LineAttribute)
+{
+  // The line will have the top side of a double height line
+  static const char input[] = "\033#3HELLO\r\n\033#4HELLO";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ(Row::TOP, parser.get_state().get_row(0).get_attributes());
+  ASSERT_EQ(Row::BOTTOM, parser.get_state().get_row(1).get_attributes());
+}
+
+/**
+ * Palette tests
+ */
+TEST(TestTermcapParser, PaletteSetColor)
+{
+  // This line should change the color value of 0 to #123456
+  static const char input[] = "\033]P0123456";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ("#123456", parser.get_palette().lookup(0).as_hex());
+}
+
+TEST(TestTermcapParser, PaletteReset)
+{
+  // This line should change the color value of 0 to #123456 and reset it afterwards
+  static const char input[] = "\033]P0123456\033]R";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ("#000000", parser.get_palette().lookup(0).as_hex());
+}
+
+/**
+ * Check if the attributes are proper even in the buffer.
+ */
+TEST(TestTermcapParser, LattrBuffered)
+{
+  static const char input[] = "HELLO\r\n\033#3HELLO\r\nHELLO";
+  TermcapParser parser("UTF-8");
+  parser.set_terminal_size(100, 1);
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ(Row::NORMAL, parser.get_state().get_row(0).get_mode());
+  ASSERT_EQ(Row::TOP, parser.get_state().get_row(-1).get_mode());
+}
+
+/**
+ * Check if combining characters are displayed properly
+ */
+TEST(TestTermcapParser, Combining)
+{
+  static const char input[] = "I\xcc\x80I";
+  TermcapParser parser("UTF-8");
+  parser.set_terminal_size(3, 1);
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  ASSERT_EQ(L"I\u0300", parser.get_state().get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"I", parser.get_state().get_cell(0, 1).get_characters());
+}

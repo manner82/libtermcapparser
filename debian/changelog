@@ -1,0 +1,54 @@
+libtermcapparser (0.60+2009-11-22-1bb50.1) precise; urgency=low
+
+  * libtermcapparser repackaged
+
+ -- Laszlo Megyer <lez@balabit.hu>  Thu, 17 Oct 2013 11:36:55 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.6) zorpos40; urgency=low
+
+  * libtermcapparser/Makefile: use includes from install dir too
+
+ -- Balazs Toth <tobal@balabit.hu>  Thu, 12 Sep 2013 13:49:21 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.5) zorpos40; urgency=low
+
+  * libtermcapparser: removed obsolete interfaces
+  * libtermcapparser: make Cell attribute constans public
+  * libtermcapparser: allow Palette construction from an array of RgbColors
+
+ -- Andras Czigany <ras@bacon.balabit>  Mon, 29 Jul 2013 11:39:21 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.4) maverick; urgency=low
+
+  * Added palette support
+  * Added combining character support
+  * Added line attribute support
+
+ -- Hercinger Viktor <herczy@balabit.hu>  Fri, 31 Aug 2012 15:13:15 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.3) zorpos40; urgency=low
+
+  * Replace libtermcapparser's Makefile with dynamically generated dependencies one.
+
+ -- Zoltan Mate <matez@balabit.hu>  Wed, 13 Jun 2012 14:53:03 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.2) zorpos40; urgency=low
+
+  * Add ADP extension.
+
+ -- Zoltan Mate <matez@balabit.hu>  Wed, 13 Jun 2012 14:53:03 +0200
+
+libtermcapparser (0.60+2009-11-22-1bb40.1) zorpos40; urgency=low
+
+  * Version fix
+
+ -- Emese Revfy <ganesa@balabit.hu>  Tue, 19 Apr 2011 17:40:42 +0200
+
+libtermcapparser (0.60+2009-11-22-1.zorpos40.1) lucid; urgency=low
+
+  * Forwardported 100_balabit_batch_mode_passphrase patch from 0.58
+  * Added dpatch as build dependency
+  * Modified debian/rules to work with dpatch
+
+ -- pala <pala@palamachine.balabit>  Mon, 09 Aug 2010 11:45:17 +0200
+
