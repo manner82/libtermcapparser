@@ -1,3 +1,11 @@
+libtermcapparser (1.0.1) precise; urgency=low
+
+  * Minor enhancements
+  * Changed versioning scheme because it's not related to putty,
+    but the code itself comes from PuTTY v0.62
+
+ -- Laszlo Attila Toth <panther@balabit.hu>  Fri, 18 Oct 2013 14:54:58 +0200
+
 libtermcapparser (0.60+2009-11-22-1bb50.1) precise; urgency=low
 
   * libtermcapparser repackaged
