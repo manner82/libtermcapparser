@@ -1,0 +1,10 @@
+Makefile.dep
+*.o
+*.orig
+*.rej
+*.swp
+*.swo
+\#*
+*.bak
+*~
+/libtermcapparser.so
