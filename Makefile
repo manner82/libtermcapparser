@@ -1,9 +1,7 @@
 # Makefile for putty puttyparser parser for ADP
 
-include Makefile.config
-
-libdir=$(prefix)/lib
-incdir=$(prefix)/include
+libdir=$(PREFIX)/lib
+incdir=$(PREFIX)/include
 
 CFLAGS = -O2 -Wall -g -I. -I./ -I./charset/ -I./unix -I$(incdir) -fPIC -DNO_GSSAPI
 CCFLAGS = $(CFLAGS)
