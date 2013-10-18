@@ -1,7 +1,0 @@
-9c2ec6adcf0b488cef469ef85bfe8da3  usr/include/putty/cell.hh
-a5176a005a334053073530e76083b86b  usr/include/putty/exception.hh
-8036a0426bb3ea0ce59db94770521691  usr/include/putty/palette.hh
-357ece26011c62ff35359dbfa584b37f  usr/include/putty/row.hh
-3394ebec5b4be9baafc3912f30a0a047  usr/include/putty/state.hh
-e315bfbed9dcfe48af67e37caafc2963  usr/include/putty/termcapparser.hh
-9f4ed93fedc95d26c4a805e023cd2e6a  usr/share/doc/libtermcapparser-dev/changelog.Debian.gz

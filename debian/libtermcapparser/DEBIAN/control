@@ -1,9 +1,0 @@
-Package: libtermcapparser
-Version: 0.60+2009-11-22-1bb50.1
-Architecture: amd64
-Maintainer: Laszlo Megyer <lez@balabit.hu>
-Installed-Size: 320
-Depends: libc6 (>= 2.14), libgcc1 (>= 1:4.1.1), libstdc++6 (>= 4.4.0)
-Section: libs
-Priority: optional
-Description: The libtermcapparser for ADP
