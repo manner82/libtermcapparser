@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Build script only for libtermcapparser.
+# The unix/configure script of putty 0.60 does not work on Ubuntu 10.10.
+
+cmd=$1
+shift
+case "$cmd" in
+  get-version)
+        head -1 debian/changelog | sed -e 's/.*(\([^)]*\)).*/\1/'
+        ;;
+  build-exclude-list|dist-exclude-list)
+    ## These lists can be used to delegate build-time and dist-time exclude lists
+    ## For example (syslog-ng-agent):
+    ##
+    ##    echo "out obj *.aqt *.ncb *.suo *.vcproj.*.user"
+    ##
+    ;;
+  prepare-dist)
+    ;;
+  bootstrap)
+    # No bootstrap
+    ;;
+  configure)
+    make PREFIX=$ZWA_MODULE_INSTALL_DIR dep
+    ;;
+  make)
+    make PREFIX=$ZWA_MODULE_INSTALL_DIR "$@"
+    ;;
+  *)
+    echo "Unknown command: '$cmd'." >&2
+    exit 1
+    ;;
+esac
