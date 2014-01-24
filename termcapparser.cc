@@ -248,6 +248,8 @@ TermcapParser::get_state() const
    */
   term_scroll(inst->term, -1, 0);
 
+  state.set_alternate_screen(inst->term->alt_which != 0);
+
   return state;
 }
 

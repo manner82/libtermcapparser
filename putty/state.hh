@@ -48,6 +48,12 @@ namespace Putty
     { return buffer_size; }
 
     /**
+     * Whether it is an alternate screen or not.
+     */
+    inline bool is_alternate_screen() const
+    { return alternate_screen; }
+
+    /**
      * Get the character and attribute pair (a Cell object) at any given position.
      * Negative row number means buffer content zero or positive means screen content.
      *
@@ -98,6 +104,13 @@ namespace Putty
     void set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr);
 
     /**
+     * Set the set_alternate_screen according to the given parameter.
+     *
+     * @param alternate_screen Is it an alternate screen?
+     */
+    void set_alternate_screen(bool alternate_screen);
+
+    /**
      * Get the given row. The internal version does not require a const object.
      *
      * @param row Row position.
@@ -131,6 +144,8 @@ namespace Putty
     unsigned height;
     /** Line count of buffer */
     unsigned buffer_size;
+    /** Is alternate screen? */
+    bool alternate_screen;
 
     /** List of rows. */
     Row *rows;
