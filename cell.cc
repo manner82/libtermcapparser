@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "putty/cell.hh"
-#include "putty/exception.hh"
 
 using namespace Putty;
 

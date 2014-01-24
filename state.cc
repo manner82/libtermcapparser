@@ -1,5 +1,4 @@
 #include "putty/state.hh"
-#include "putty/exception.hh"
 #include "putty/row.hh"
 
 #include <sstream>

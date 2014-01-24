@@ -2,7 +2,6 @@
 
 #include "terminal.h"
 
-#include "putty/exception.hh"
 #include "putty/termcapparser.hh"
 #include <sstream>
 
