@@ -9,10 +9,10 @@ INSTALL = install
 
 TARGET=libtermcapparser.so
 HEADER_DIR=putty
-HEADERS=$(HEADER_DIR)/termcapparser.hh $(HEADER_DIR)/state.hh $(HEADER_DIR)/row.hh $(HEADER_DIR)/cell.hh $(HEADER_DIR)/palette.hh $(HEADER_DIR)/exception.hh
+HEADERS=$(HEADER_DIR)/termcapparser.hh $(HEADER_DIR)/state.hh $(HEADER_DIR)/row.hh $(HEADER_DIR)/cell.hh $(HEADER_DIR)/palette.hh
 LDFLAGS+=-shared
 
-CXX_OBJS = puttyparser.cc termcapparser.cc state.cc cell.cc row.cc palette.cc exception.cc
+CXX_OBJS = puttyparser.cc termcapparser.cc state.cc cell.cc row.cc palette.cc
 
 C_OBJS = charset/fromucs.c ldisc.c ldiscucs.c charset/localenc.c charset/mimeenc.c minibidi.c misc.c charset/sbcs.c charset/sbcsdat.c charset/slookup.c terminal.c time.c fake_timing.c charset/toucs.c tree234.c charset/utf8.c unix/uxmisc.c unix/uxucs.c wcwidth.c charset/xenc.c
 

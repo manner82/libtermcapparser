@@ -1,5 +1,4 @@
 #include "putty/state.hh"
-#include "putty/exception.hh"
 #include "putty/row.hh"
 
 #include <sstream>
@@ -10,6 +9,7 @@ State::State()
   : width(0),
     height(0),
     buffer_size(0),
+    alternate_screen(false),
     rows(0)
 {
 }
@@ -18,6 +18,7 @@ State::State(const State &other)
   : width(other.width),
     height(other.height),
     buffer_size(other.buffer_size),
+    alternate_screen(other.alternate_screen),
     rows(0),
     palette(other.palette)
 {
@@ -59,6 +60,12 @@ void
 State::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr)
 {
   rows[row + buffer_size].cells[col].set(characters, attr);
+}
+
+void
+State::set_alternate_screen(bool alternate_screen)
+{
+  this->alternate_screen = alternate_screen;
 }
 
 Row &

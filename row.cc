@@ -1,5 +1,4 @@
 #include "putty/row.hh"
-#include "putty/exception.hh"
 
 using namespace Putty;
 

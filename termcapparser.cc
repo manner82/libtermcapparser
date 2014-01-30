@@ -2,7 +2,6 @@
 
 #include "terminal.h"
 
-#include "putty/exception.hh"
 #include "putty/termcapparser.hh"
 #include <sstream>
 
@@ -248,6 +247,8 @@ TermcapParser::get_state() const
    * automatically by update_display.
    */
   term_scroll(inst->term, -1, 0);
+
+  state.set_alternate_screen(inst->term->alt_which != 0);
 
   return state;
 }
