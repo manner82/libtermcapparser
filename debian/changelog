@@ -1,3 +1,9 @@
+libtermcapparser (1.0.2) precise; urgency=low
+
+  * Screen type can be queried in Putty::State
+
+ -- Domok Tamas <domoktamas@balabit.hu>  Wed, 12 Feb 2014 15:11:00 +0200
+
 libtermcapparser (1.0.1) precise; urgency=low
 
   * Minor enhancements
