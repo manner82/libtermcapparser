@@ -133,6 +133,11 @@ TermcapParser::TermcapParser(char *charset)
    */
   inst->cfg.lfhascr = 0;
 
+  /*
+   * Set autowrap long lines.
+   */
+  inst->cfg.wrap_mode = 1;
+
   /* initialize terminal structure */
   inst->term = term_init(&inst->cfg, &inst->ucsdata, inst);
   inst->term->ldisc = 0;
