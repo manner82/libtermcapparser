@@ -17,15 +17,15 @@ namespace
     Palette::RgbColor( 0x80, 0x80, 0x00 ),         //   3
     Palette::RgbColor( 0x00, 0x00, 0x80 ),         //   4
     Palette::RgbColor( 0x80, 0x00, 0x80 ),         //   5
-    Palette::RgbColor( 0x00, 0x80, 0x00 ),         //   6
-    Palette::RgbColor( 0x80, 0x80, 0x80 ),         //   7
-    Palette::RgbColor( 0x20, 0x20, 0x20 ),         //   8
+    Palette::RgbColor( 0x00, 0x80, 0x80 ),         //   6
+    Palette::RgbColor( 0xc0, 0xc0, 0xc0 ),         //   7
+    Palette::RgbColor( 0x80, 0x80, 0x80 ),         //   8
     Palette::RgbColor( 0xff, 0x00, 0x00 ),         //   9
     Palette::RgbColor( 0x00, 0xff, 0x00 ),         //  10
     Palette::RgbColor( 0xff, 0xff, 0x00 ),         //  11
     Palette::RgbColor( 0x00, 0x00, 0xff ),         //  12
     Palette::RgbColor( 0xff, 0x00, 0xff ),         //  13
-    Palette::RgbColor( 0x00, 0xff, 0x00 ),         //  14
+    Palette::RgbColor( 0x00, 0xff, 0xff ),         //  14
     Palette::RgbColor( 0xff, 0xff, 0xff ),         //  15
     Palette::RgbColor( 0x00, 0x00, 0x00 ),         //  16
     Palette::RgbColor( 0x00, 0x00, 0x5f ),         //  17
