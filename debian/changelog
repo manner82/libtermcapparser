@@ -1,3 +1,10 @@
+libtermcapparser (1.0.3) zorp-os-5.0; urgency=low
+
+  * Highlighting for bold colors, and minor palette fixes
+  * Auto wrap long lines
+
+ -- Manner Robert <manner@balabit.hu>  Fri, 27 Jun 2014 13:11:00 +0200
+
 libtermcapparser (1.0.2) precise; urgency=low
 
   * Screen type can be queried in Putty::State
