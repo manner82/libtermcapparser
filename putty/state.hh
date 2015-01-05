@@ -79,6 +79,24 @@ namespace Putty
     { return palette; }
 
     /**
+     * Whether the cursor enabled flag is true.
+     */
+    bool is_cursor_enabled() const
+    { return cursor_enabled; }
+
+    /**
+     * Get the cursor's x coordinate.
+     */
+    int get_cursor_x() const
+    { return cursor_x; }
+
+    /**
+     * Get the cursor's y coordinate.
+     */
+    int get_cursor_y() const
+    { return cursor_y; }
+
+    /**
      * Set the state palette.
      *
      * @param palette The new palette. It will be copied.
@@ -109,6 +127,15 @@ namespace Putty
      * @param alternate_screen Is it an alternate screen?
      */
     void set_alternate_screen(bool alternate_screen);
+
+    /**
+     * Set cursor attributes.
+     *
+     * @param enabled Whether the cursor is enabled or not.
+     * @param The x coordinate.
+     * @param The y coordinate.
+     */
+    void set_cursor(bool enabled, int x, int y);
 
     /**
      * Get the given row. The internal version does not require a const object.
@@ -146,6 +173,12 @@ namespace Putty
     unsigned buffer_size;
     /** Is alternate screen? */
     bool alternate_screen;
+    /** Is cursor enabled? */
+    bool cursor_enabled;
+    /** The cursor's x coordinate. */
+    int cursor_x;
+    /** The cursor's y coordinate. */
+    int cursor_y;
 
     /** List of rows. */
     Row *rows;

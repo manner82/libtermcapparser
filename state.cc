@@ -10,6 +10,9 @@ State::State()
     height(0),
     buffer_size(0),
     alternate_screen(false),
+    cursor_enabled(false),
+    cursor_x(0),
+    cursor_y(0),
     rows(0)
 {
 }
@@ -19,6 +22,9 @@ State::State(const State &other)
     height(other.height),
     buffer_size(other.buffer_size),
     alternate_screen(other.alternate_screen),
+    cursor_enabled(other.cursor_enabled),
+    cursor_x(other.cursor_x),
+    cursor_y(other.cursor_y),
     rows(0),
     palette(other.palette)
 {
@@ -66,6 +72,14 @@ void
 State::set_alternate_screen(bool alternate_screen)
 {
   this->alternate_screen = alternate_screen;
+}
+
+void
+State::set_cursor(bool enabled, int x, int y)
+{
+  cursor_enabled = enabled;
+  cursor_x = x;
+  cursor_y = y;
 }
 
 Row &
