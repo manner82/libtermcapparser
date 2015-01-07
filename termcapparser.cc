@@ -247,6 +247,8 @@ TermcapParser::get_state() const
     copy_term_content_to_cache(offset, -offset);
   }
 
+  state.set_cursor(inst->term->cursor_on == 1, inst->term->curs.x, inst->term->curs.y);
+
   /*
    * Scroll to the current content of the display. The content will be updated
    * automatically by update_display.
