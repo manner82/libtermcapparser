@@ -1,3 +1,9 @@
+libtermcapparser (1.0.4) zorp-os-5.0; urgency=low
+
+  * Cursor attributes can be queried from terminal state
+
+ -- Robert Manner <manner@balabit.com>  Wed, 07 Jan 2015 12:29:29 +0000
+
 libtermcapparser (1.0.3) zorp-os-5.0; urgency=low
 
   * Highlighting for bold colors, and minor palette fixes
