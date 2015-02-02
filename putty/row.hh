@@ -129,14 +129,14 @@ namespace Putty
      */
     void clear();
 
+    void swap(Row &other);
+
     /** Cells in the row. */
     Cell *cells;
 
   private:
     /** Width of the row. */
     unsigned width;
-
-
 
     /** Attributes of the row. */
     Attributes attributes;

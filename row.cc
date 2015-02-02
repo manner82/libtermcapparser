@@ -11,10 +11,15 @@ Row::Row()
 
 Row::Row(const Row &other)
   : cells(0),
-    width(0),
-    attributes(0)
+    width(other.width),
+    attributes(other.attributes)
 {
-  *this = other;
+  if (other.width > 0)
+    {
+      cells = new Cell[width];
+      for (unsigned i = 0; i < width; ++i)
+        cells[i] = other.cells[i];
+    }
 }
 
 Row::~Row()
@@ -25,19 +30,17 @@ Row::~Row()
 Row &
 Row::operator=(const Row &other)
 {
-  clear();
-
-  if (other.width != 0)
-    {
-      width = other.width;
-      cells = new Cell[width];
-      for (unsigned i = 0; i < width; ++i)
-        cells[i] = other.cells[i];
-    }
-
-  attributes = other.attributes;
-
+  Row tmp(other);
+  tmp.swap(*this);
   return *this;
+}
+
+void
+Row::swap(Row &other)
+{
+  std::swap(width, other.width);
+  std::swap(attributes, other.attributes);
+  std::swap(cells, other.cells);
 }
 
 const Cell &
