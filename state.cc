@@ -33,6 +33,28 @@ State::State(const State &other)
     rows[row] = other.rows[row];
 }
 
+State &
+State::operator=(const State &other)
+{
+  State tmp(other);
+  tmp.swap(*this);
+  return *this;
+}
+
+void
+State::swap(State &other)
+{
+  std::swap(width, other.width);
+  std::swap(height, other.height);
+  std::swap(buffer_size, other.buffer_size);
+  std::swap(alternate_screen, other.alternate_screen);
+  std::swap(cursor_enabled, other.cursor_enabled);
+  std::swap(cursor_x, other.cursor_x);
+  std::swap(cursor_y, other.cursor_y);
+  std::swap(palette, other.palette);
+  std::swap(rows, other.rows);
+}
+
 State::~State()
 {
   if (rows)

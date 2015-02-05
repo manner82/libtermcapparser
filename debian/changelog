@@ -1,3 +1,9 @@
+libtermcapparser (1.0.5) zorp-os-5.0; urgency=low
+
+  * fix operator= for Putty::State
+
+ -- Robert Manner <manner@balabit.com>  Thu, 05 Feb 2015 09:20:07 +0000
+
 libtermcapparser (1.0.4) zorp-os-5.0; urgency=low
 
   * Cursor attributes can be queried from terminal state

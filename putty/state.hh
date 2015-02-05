@@ -29,6 +29,8 @@ namespace Putty
      */
     virtual ~State();
 
+    State &operator=(const State &other);
+
     /**
      * Get terminal width.
      */
@@ -109,6 +111,8 @@ namespace Putty
      * Create an empty state.
      */
     State();
+
+    void swap(State &other);
 
     /**
      * Set the character and attribute pair (a Cell object) at any given position.
