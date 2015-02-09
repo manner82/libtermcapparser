@@ -13,7 +13,7 @@ clean:
 	rm -f $(OBJECTS) test
 
 test: $(OBJECTS)
-	$(CXX) -o test $(LDFLAGS) $(OBJECTS)
+	$(CXX) -o test $(OBJECTS) $(LDFLAGS)
 
 %.o: %.cc
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
