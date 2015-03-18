@@ -91,8 +91,9 @@ namespace
     };
 }
 
-TermcapParser::TermcapParser(char *charset)
-  : enable_update_display(true)
+TermcapParser::TermcapParser(char *charset, int terminal_buffer_height)
+  : enable_update_display(true),
+    terminal_buffer_height(terminal_buffer_height)
 {
   /* Create an instance structure and initialise to zeroes */
   inst = snew(struct gui_data);
@@ -100,14 +101,6 @@ TermcapParser::TermcapParser(char *charset)
 
   /* Set the termcap parser object */
   inst->parser = this;
-
-  /* FIXME: decide how to set the terminals initial size */
-  const int initial_terminal_width = 80;
-  const int initial_terminal_height = 24;
-  const int initial_buffer_height = 100000;
-
-  /* set instance dimensions */
-  set_buffer_size(initial_terminal_width, initial_buffer_height);
 
   /* initialize unicode config */
   init_ucs(&inst->ucsdata, charset, 0, CS_UTF8, VT_UNICODE);
@@ -122,9 +115,6 @@ TermcapParser::TermcapParser(char *charset)
 
   /* DO NOT REMOVE! This config option ensures that an erase will be done with the proper bg color. */
   inst->cfg.bce = 1;
-
-  /* Set the buffer lines to save */
-  inst->cfg.savelines = initial_buffer_height - initial_terminal_height;
 
   /*
    * LF implies a CR-LF since in some cases (like ssh command execution) only LF is sent.
@@ -147,7 +137,7 @@ TermcapParser::TermcapParser(char *charset)
   term_provide_logctx(inst->term, inst->logctx);
 
   /* set terminal visual size: row number, column number, saveline option */
-  set_terminal_size(initial_terminal_width, initial_terminal_height);
+  set_terminal_size(80, 24);
 }
 
 TermcapParser::~TermcapParser()
@@ -192,8 +182,10 @@ void
 TermcapParser::set_terminal_size(int width, int height)
 {
   state.resize_display(width, height);
-  term_size(inst->term, height, width, inst->cfg.savelines);
-  set_buffer_size(inst->height, width);
+
+  int max_height = std::max(terminal_buffer_height, height);
+  term_size(inst->term, height, width, max_height - height);
+  set_buffer_size(width, max_height);
 }
 
 void

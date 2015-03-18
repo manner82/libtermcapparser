@@ -34,8 +34,9 @@ namespace Putty
      * Constructor.
      *
      * @param charset Character encoding of the terminal emulation.
+     * @param terminal_buffer_height Terminal buffer height, zero means buffer is disabled.
      */
-    TermcapParser(char *charset);
+    TermcapParser(char *charset, int terminal_buffer_height = 100000);
 
     /**
      * Destructor.
@@ -135,6 +136,7 @@ namespace Putty
     Palette palette;                      /**< Currently used palette */
 
     mutable bool enable_update_display;   /**< Enable/disable updating the display with update_display */
+    int terminal_buffer_height;           /**< Terminal buffer height */
   };
 
 } // namespace Putty
