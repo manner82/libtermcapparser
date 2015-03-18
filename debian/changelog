@@ -1,3 +1,9 @@
+libtermcapparser (1.0.6) zorp-os-5.0; urgency=low
+
+  * Terminal buffering can be disabled.
+
+ -- Tamas Domok <tamas.domok@balabit.com>  Wed, 18 Feb 2015 11:25:00 +0000
+
 libtermcapparser (1.0.5) zorp-os-5.0; urgency=low
 
   * fix operator= for Putty::State
