@@ -1,6 +1,8 @@
 #ifndef PUTTY_PALETTE_HH_INCLUDE
 #define PUTTY_PALETTE_HH_INCLUDE
 
+#include <string.h>
+
 namespace Putty
 {
 
