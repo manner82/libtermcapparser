@@ -1,3 +1,9 @@
+libtermcapparser (1.0.7) zorp-os-5.0; urgency=low
+
+  * Compile fix.
+
+ -- Tamas Domok <tamas.domok@balabit.com>  Mon, 4 May 2015 09:55:00 +0000
+
 libtermcapparser (1.0.6) zorp-os-5.0; urgency=low
 
   * Terminal buffering can be disabled.
