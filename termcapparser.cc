@@ -5,6 +5,8 @@
 #include "putty/termcapparser.hh"
 #include <sstream>
 
+#include <ostream>
+
 using namespace Putty;
 
 namespace
@@ -291,6 +293,23 @@ const State &
 TermcapParser::get_state() const
 {
   int buffer_line_count = sblines(inst->term);
+
+  if (buffer_line_count < 0)
+    {
+      std::ostringstream stream;
+      stream << "Negative scrollback lines received; number='" << buffer_line_count << "'";
+      log_message(stream.str());
+      buffer_line_count = 0;
+    }
+
+  if (buffer_line_count > terminal_buffer_height)
+    {
+      std::ostringstream stream;
+      stream << "Too big scrollback lines received; number='" << buffer_line_count << "'";
+      log_message(stream.str());
+      buffer_line_count = terminal_buffer_height;
+    }
+
   state.resize(inst->term->cols, inst->term->rows, buffer_line_count);
   state.set_palette(palette);
 
