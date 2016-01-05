@@ -137,6 +137,7 @@ namespace Putty
 
     mutable bool enable_update_display;   /**< Enable/disable updating the display with update_display */
     int terminal_buffer_height;           /**< Terminal buffer height */
+    std::string buffered_data_input;      /**< Buffer data input when control sequence was not complete */
   };
 
 } // namespace Putty

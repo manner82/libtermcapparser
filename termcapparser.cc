@@ -10,6 +10,9 @@ using namespace Putty;
 namespace
 {
 
+  static const int CONTROL_SEQUENCE_LENGTH = 8;
+  static const char ESCAPE_CHAR = '\033';
+
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
   /**
@@ -89,6 +92,31 @@ namespace
       _Type &ref;     /**< Variable reference */
       _Type oldval;   /**< Old value of the variable (before change) */
     };
+
+
+    inline void move_on(const char *&data, int &size, int offset)
+    {
+      data = data + offset;
+      size -= offset;
+    }
+
+    inline bool is_control_sequence_partial(int data_length)
+    {
+      return data_length < CONTROL_SEQUENCE_LENGTH;
+    }
+
+    inline int get_first_control_sequence_pos(const char *data, int len)
+    {
+      int check_length = len - 1;
+      for (int pos = 0; pos < check_length; ++pos)
+        {
+          if ((data[pos] == ESCAPE_CHAR) && (data[pos + 1] == 'P'))
+            {
+              return pos;
+            }
+        }
+      return -1;
+    }
 }
 
 TermcapParser::TermcapParser(char *charset, int terminal_buffer_height)
@@ -149,19 +177,52 @@ TermcapParser::~TermcapParser()
 void
 TermcapParser::data_input(const char *data, int len)
 {
-  int prev = 0;
+  const char *data_to_process = data;
+  int data_to_process_len = len;
 
-  for (int pos = 0; pos != len; ++pos)
+  if (buffered_data_input.size() > 0)
     {
-      if (data[pos] == '\033' && (pos != len - 1 && data[pos + 1] == 'P'))
-        {
-          data_input_filtered(data + prev, pos - prev);
-          pos += 7;
-          prev = pos + 1;
-        }
+      buffered_data_input.append(data, len);
+      data_to_process = buffered_data_input.c_str();
+      data_to_process_len = buffered_data_input.size();
     }
 
-  data_input_filtered(data + prev, len - prev);
+  while (data_to_process_len > 0)
+    {
+      if (data_to_process_len == 1 && data_to_process[0] == ESCAPE_CHAR)
+        {
+          buffered_data_input.resize(1);
+          buffered_data_input[0] = ESCAPE_CHAR;
+          break;
+        }
+
+      int first_control_sequence_pos = get_first_control_sequence_pos(data_to_process, data_to_process_len);
+
+      if (first_control_sequence_pos != -1)
+        {
+          data_input_filtered(data_to_process, first_control_sequence_pos);
+          move_on(data_to_process, data_to_process_len, first_control_sequence_pos);
+
+          if (is_control_sequence_partial(data_to_process_len))
+            {
+              buffered_data_input = std::string(data_to_process, data_to_process_len);
+              break;
+            }
+
+          // Skip the control sequence
+          move_on(data_to_process, data_to_process_len, CONTROL_SEQUENCE_LENGTH);
+        }
+      else // Leftover
+        {
+          data_input_filtered(data_to_process, data_to_process_len);
+
+          data_to_process = 0;
+          data_to_process_len = 0;
+        }
+
+      if (data_to_process_len <= 0)
+        buffered_data_input.clear();
+    }
 }
 
 void

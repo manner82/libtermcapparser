@@ -149,10 +149,39 @@ TEST(TestTermcapParser, LFhasCRConfiguration)
   ASSERT_EQ(L"b", parser_lfcr.get_state().get_cell(1, 0).get_characters());
 }
 
+TEST(TestTermcapParser, FilterControlSequence)
+{
+  const char testdata[] = "AB\033PCDEFGHIJKLM";
+  TermcapParser parser("UTF-8");
+  parser.data_input(testdata, sizeof(testdata));
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"A", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"B", state.get_cell(0, 1).get_characters());
+  ASSERT_EQ(L"I", state.get_cell(0, 2).get_characters());
+  ASSERT_EQ(L"J", state.get_cell(0, 3).get_characters());
+}
+
+TEST(TestTermcapParser, FilterConsecutiveControlSequences1)
+{
+  static const char input[] = "abc\033P+q1234\033P+q1234ef";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(input, sizeof(input) - 1);
+
+  char data[6];
+  for (unsigned col = 0; col < 5; ++col)
+    data[col] = (char)parser.get_state().get_cell(0, col).get_characters()[0];
+  data[5] = '\0';
+
+  ASSERT_STREQ("abcef", data);
+}
+
 /**
  * Test device control string filter
  */
-TEST(TestTermcapParser, FilterControl)
+TEST(TestTermcapParser, FilterConsecutiveControlSequences2)
 {
   static const char input[] = "abc\033P+q1234d\033P+q1234ef";
   TermcapParser parser("UTF-8");
@@ -165,6 +194,68 @@ TEST(TestTermcapParser, FilterControl)
   data[6] = '\0';
 
   ASSERT_STREQ("abcdef", data);
+}
+
+TEST(TestTermcapParser, FilterControlSequenceBuffering1)
+{
+  const char testdata[] = "AB\033PCDEFGHIJKLM";
+  TermcapParser parser("UTF-8");
+
+  for (int i = 0; i < sizeof(testdata); ++i)
+    parser.data_input(testdata + i, 1);
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"A", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"B", state.get_cell(0, 1).get_characters());
+  ASSERT_EQ(L"I", state.get_cell(0, 2).get_characters());
+  ASSERT_EQ(L"J", state.get_cell(0, 3).get_characters());
+}
+
+TEST(TestTermcapParser, FilterControlSequenceBuffering2)
+{
+  const char testdata[] = "AB\033PCDEFGHIJKLM";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(testdata, 5);
+  parser.data_input(testdata + 5, sizeof(testdata) - 5);
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"A", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"B", state.get_cell(0, 1).get_characters());
+  ASSERT_EQ(L"I", state.get_cell(0, 2).get_characters());
+  ASSERT_EQ(L"J", state.get_cell(0, 3).get_characters());
+}
+
+TEST(TestTermcapParser, FilterControlSequenceStartingWithControlSequence)
+{
+  const char testdata[] = "\033PCDEFGHIJKLM";
+  TermcapParser parser("UTF-8");
+
+  parser.data_input(testdata, 5);
+  parser.data_input(testdata + 5, sizeof(testdata) - 5);
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"I", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"J", state.get_cell(0, 1).get_characters());
+}
+
+TEST(TestTermcapParser, FilterControlSequenceEscapeCharInTheMiddle)
+{
+  const char testdata[] = "AB\033PC\033EFGHIJKLM";
+  TermcapParser parser("UTF-8");
+
+  for (int i = 0; i < sizeof(testdata); ++i)
+    parser.data_input(testdata + i, 1);
+
+  const State &state = parser.get_state();
+
+  ASSERT_EQ(L"A", state.get_cell(0, 0).get_characters());
+  ASSERT_EQ(L"B", state.get_cell(0, 1).get_characters());
+  ASSERT_EQ(L"I", state.get_cell(0, 2).get_characters());
+  ASSERT_EQ(L"J", state.get_cell(0, 3).get_characters());
 }
 
 /**
