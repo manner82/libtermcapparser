@@ -359,4 +359,29 @@ TEST(TestTermcapParser, Combining)
   ASSERT_EQ(L"I", parser.get_state().get_cell(0, 1)->get_characters());
 }
 
+namespace
+{
+  std::string last_log_message;
+  void log_callback(const std::string &message)
+  {
+    last_log_message = message;
+  }
+}
+
+TEST(TestTermcapParser, UpdateDisplayInvalidColumn)
+{
+  TermcapParser parser("UTF-8");
+  parser.set_log_callback(log_callback);
+  parser.update_display(parser.get_state().get_width(), 0, std::wstring(L"abc"), 0, 0);
+
+  ASSERT_STREQ("Invalid position requested to be updated; row='0', col='82'", last_log_message.c_str());
+}
+
+TEST(TestTermcapParser, UpdateDisplayInvalidRow)
+{
+  TermcapParser parser("UTF-8");
+  parser.set_log_callback(log_callback);
+  parser.update_display(0, parser.get_state().get_height(), std::wstring(L"abc"), 0, 0);
+
+  ASSERT_STREQ("Invalid row requested to be updated; row='24'", last_log_message.c_str());
 }

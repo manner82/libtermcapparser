@@ -236,6 +236,18 @@ TermcapParser::data_input_filtered(const char *data, int len)
 }
 
 void
+TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const
+{
+  bool success = state.set_cell(row, col, characters, attr);
+  if (!success)
+    {
+      std::ostringstream stream;
+      stream << "Invalid position requested to be updated; row='" << row << "', " << "col='" << col << "'";
+      log_message(stream.str());
+    }
+}
+
+void
 TermcapParser::set_buffer_size(int width, int height)
 {
   inst->width = width;
@@ -262,6 +274,14 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
   for (unsigned row = 0; row < row_count; row++)
     {
       Row *r = state.get_row_internal(offset + (int)row);
+      if (!r)
+        {
+          std::ostringstream stream;
+          stream << "Invalid row requested to be updated; row='" << row << "', offset='" << offset << "'";
+          log_message(stream.str());
+          continue;
+        }
+
       r->set_attributes(inst->term->disptext[row]->lattr);
       for (unsigned col = 0; col < (unsigned)inst->term->cols; col++)
         {
@@ -275,9 +295,7 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
               relative_offset = inst->term->disptext[row]->chars[ absolute_offset ].cc_next;
               absolute_offset += relative_offset;
             } while(relative_offset != 0);
-          state.set_cell(offset + (int)row, col,
-                           characters,
-                           inst->term->disptext[row]->chars[col].attr);
+          set_cell(offset + (int)row, col, characters, inst->term->disptext[row]->chars[col].attr);
           characters.clear();
         }
     }
@@ -361,22 +379,28 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
 
   std::wstring chr;
   Row *row = state.get_row_internal(y);
+  if (!row)
+    {
+      std::ostringstream stream;
+      stream << "Invalid row requested to be updated; row='" << y << "'";
+      log_message(stream.str());
+      return;
+    }
 
   row->set_attributes(lattr);
   for (std::wstring::const_iterator it = str.begin(); it != str.end(); ++it)
     {
       if (it != str.begin() && !is_combining_character(*it))
         {
-          state.set_cell(y, x, chr, attr);
+          set_cell(y, x, chr, attr);
           ++x;
           chr.clear();
-
         }
       chr.push_back(*it);
     }
 
   if (!chr.empty())
-    state.set_cell(y, x, chr, attr);
+    set_cell(y, x, chr, attr);
 }
 
 void
