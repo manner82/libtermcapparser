@@ -121,7 +121,8 @@ namespace
 
 TermcapParser::TermcapParser(char *charset, int terminal_buffer_height)
   : enable_update_display(true),
-    terminal_buffer_height(terminal_buffer_height)
+    terminal_buffer_height(terminal_buffer_height),
+    log_callback(0)
 {
   /* Create an instance structure and initialise to zeroes */
   inst = snew(struct gui_data);
@@ -279,6 +280,13 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
     }
 }
 
+void
+TermcapParser::log_message(const std::string &message) const
+{
+  if (log_callback)
+    log_callback(message);
+}
+
 const State &
 TermcapParser::get_state() const
 {
@@ -347,4 +355,10 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
 
   if (!chr.empty())
     state.set_cell(y, x, chr, attr);
+}
+
+void
+TermcapParser::set_log_callback(LogCallback log_callback)
+{
+  this->log_callback = log_callback;
 }

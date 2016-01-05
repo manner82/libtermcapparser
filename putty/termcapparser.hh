@@ -25,6 +25,11 @@ namespace Putty
 {
 
   /**
+   * The LogCallback is used to log warning messages.
+   */
+  typedef void (*LogCallback)(const std::string &message);
+
+  /**
    * Termcap parser wrapping for the terminal code in putty.
    */
   class TermcapParser
@@ -102,6 +107,13 @@ namespace Putty
      */
     void update_display(int x, int y, const std::wstring &str, unsigned long attr, long lattr);
 
+    /**
+     * Change the log callback function.
+     *
+     * @param log_callback The callback function
+     */
+    void set_log_callback(LogCallback log_callback);
+
   protected:
     /**
      * Set the buffer size.
@@ -129,7 +141,14 @@ namespace Putty
      */
     void copy_term_content_to_cache(int offset, unsigned row_count) const;
 
-  private:
+    /**
+     * Log message if the log callback is set.
+     *
+     * @param message The message to log
+     */
+    void log_message(const std::string &message) const;
+
+  protected:
     struct gui_data *inst;                /**< Putty internal terminal representation. */
     mutable State state;                  /**< Current terminal state */
 
@@ -137,6 +156,8 @@ namespace Putty
 
     mutable bool enable_update_display;   /**< Enable/disable updating the display with update_display */
     int terminal_buffer_height;           /**< Terminal buffer height */
+    LogCallback log_callback;             /**< Log callback function */
+
     std::string buffered_data_input;      /**< Buffer data input when control sequence was not complete */
   };
 
