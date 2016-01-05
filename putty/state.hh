@@ -63,8 +63,8 @@ namespace Putty
      * @param col Column of the cell.
      * @return Cell reference at the given position.
      */
-    const Cell &get_cell(int row, unsigned col) const;
-    Cell &get_cell(int row, unsigned col);
+    const Cell *get_cell(int row, unsigned col) const;
+    Cell *get_cell(int row, unsigned col);
 
     /**
      * Get the given row.
@@ -72,7 +72,7 @@ namespace Putty
      * @param row Row position.
      * @return Reference to Row object.
      */
-    const Row &get_row(int row) const;
+    const Row *get_row(int row) const;
 
     /**
      * Get the palette of the state.
@@ -122,8 +122,10 @@ namespace Putty
      * @param col Column of the cell.
      * @param chr Character of the cell.
      * @param attr Attributes of the cell.
+     *
+     * Returns if setting the cell was successful, or not (the row/column was out of bounds).
      */
-    void set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr);
+    bool set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr);
 
     /**
      * Set the set_alternate_screen according to the given parameter.
@@ -145,9 +147,9 @@ namespace Putty
      * Get the given row. The internal version does not require a const object.
      *
      * @param row Row position.
-     * @return Reference to Row object.
+     * @return Pointer to Row object, can be null.
      */
-    Row &get_row_internal(int row);
+    Row *get_row_internal(int row);
 
     /**
      * Resize the state. Any data is kept or trimmed.
@@ -197,6 +199,8 @@ namespace Putty
      * @return true if the coordinates are invalid
      */
     bool is_invalid_row_value(int row) const;
+
+    bool is_valid_cell(int row, unsigned column) const;
   };
 
 } // namespace Putty

@@ -13,8 +13,8 @@ public:
     : State()
   {}
 
-  void set_cell(unsigned row, unsigned col, const std::wstring &characters, Cell::Attributes attr)
-  { State::set_cell(row, col, characters, attr); }
+  bool set_cell(unsigned row, unsigned col, const std::wstring &characters, Cell::Attributes attr)
+  { return State::set_cell(row, col, characters, attr); }
 
   void resize(unsigned width, unsigned height, unsigned buffer_size)
   { State::resize(width, height, buffer_size); }
@@ -75,23 +75,44 @@ TEST_F(TestState, GetCell)
     {
       for (unsigned col = 0; col != state->get_width(); ++col)
         {
-          const Cell &cell = state->get_cell(row, col);
-          ASSERT_EQ((ABS(row) << 16) | col, cell.get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
-          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell.get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
+          const Cell *cell = state->get_cell(row, col);
+          ASSERT_TRUE(cell);
+          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
+}
+
+TEST_F(TestState, GetCellForInvalidPosition)
+{
+  ASSERT_TRUE(state->get_cell(state->get_height() - 1, 0));
+  ASSERT_FALSE(state->get_cell(state->get_height(), 0));
+
+  ASSERT_FALSE(state->get_cell(0, state->get_width()));
+  ASSERT_TRUE(state->get_cell(0, state->get_width() - 1));
+
+  ASSERT_TRUE(state->get_cell(-(int)state->get_buffer_size(), 0));
+  ASSERT_FALSE(state->get_cell(-(int)state->get_buffer_size() - 1, 0));
+}
+
+TEST_F(TestState, SetCellForInvalidPosition)
+{
+  ASSERT_FALSE(state->set_cell(state->get_height(), 0, std::wstring(L"abc"), 0));
+  ASSERT_FALSE(state->set_cell(0, state->get_width(), std::wstring(L"abc"), 0));
 }
 
 TEST_F(TestState, GetRow)
 {
   for (int row = -128; row != state->get_height(); ++row)
     {
-      const Row &termrow = state->get_row(row);
+      const Row *termrow = state->get_row(row);
+      ASSERT_TRUE(termrow);
       for (unsigned col = 0; col != state->get_width(); ++col)
         {
-          const Cell &cell = termrow.get_cell(col);
-          ASSERT_EQ((ABS(row) << 16) | col, cell.get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
-          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell.get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
+          const Cell *cell = termrow->get_cell(col);
+          ASSERT_TRUE(cell);
+          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
 }
@@ -113,12 +134,14 @@ TEST_F(TestState, ResizeBigger)
 
   for (int row = -old_buffer_size; row != old_height; ++row)
     {
-      const Row &termrow = state->get_row(row);
+      const Row *termrow = state->get_row(row);
+      ASSERT_TRUE(termrow);
       for (unsigned col = 0; col != old_width; ++col)
         {
-          const Cell &cell = termrow.get_cell(col);
-          ASSERT_EQ((ABS(row) << 16) | col, cell.get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
-          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell.get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
+          const Cell *cell = termrow->get_cell(col);
+          ASSERT_TRUE(cell);
+          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
 }
@@ -129,12 +152,15 @@ TEST_F(TestState, ResizeSmaller)
 
   for (int row = -16; row != state->get_height(); ++row)
     {
-      const Row &termrow = state->get_row(row);
+      const Row *termrow = state->get_row(row);
+      ASSERT_TRUE(termrow);
       for (unsigned col = 0; col != state->get_width(); ++col)
         {
-          const Cell &cell = termrow.get_cell(col);
-          ASSERT_EQ((ABS(row) << 16) | col, cell.get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
-          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell.get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
+          const Cell *cell = termrow->get_cell(col);
+          ASSERT_TRUE(cell);
+
+          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
 }

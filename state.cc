@@ -67,27 +67,38 @@ State::is_invalid_row_value(int row) const
   return (rows == 0) || ((int)(row - height) >= 0 || (int)(row + buffer_size) < 0);
 }
 
-const Cell &
+bool
+State::is_valid_cell(int row, unsigned column) const
+{
+  return !is_invalid_row_value(row) && column < width;
+}
+
+const Cell *
 State::get_cell(int row, unsigned col) const
 {
-  return rows[row + buffer_size].cells[col];
+  return this->is_valid_cell(row, col) ? &rows[row + buffer_size].cells[col] : 0;
 }
 
-Cell &State::get_cell(int row, unsigned col)
+Cell *
+State::get_cell(int row, unsigned col)
 {
-  return rows[row + buffer_size].cells[col];
+  return is_valid_cell(row, col) ? &rows[row + buffer_size].cells[col] : 0;
 }
 
-const Row &
+const Row *
 State::get_row(int row) const
 {
-  return rows[row + buffer_size];
+  return is_invalid_row_value(row) ? 0 : &rows[row + buffer_size];
 }
 
-void
+bool
 State::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr)
 {
+  if (!is_valid_cell(row, col))
+    return false;
+
   rows[row + buffer_size].cells[col].set(characters, attr);
+  return true;
 }
 
 void
@@ -104,10 +115,10 @@ State::set_cursor(bool enabled, int x, int y)
   cursor_y = y;
 }
 
-Row &
+Row *
 State::get_row_internal(int row)
 {
-  return rows[row + buffer_size];
+  return is_invalid_row_value(row) ? 0 : &rows[row + buffer_size];
 }
 
 void

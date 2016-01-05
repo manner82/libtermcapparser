@@ -17,9 +17,9 @@ public:
     Row::set_width(width);
   }
 
-  void set_cell(unsigned col, const std::wstring &characters, Cell::Attributes attr)
+  bool set_cell(unsigned col, const std::wstring &characters, Cell::Attributes attr)
   {
-    Row::set_cell(col, characters, attr);
+    return Row::set_cell(col, characters, attr);
   }
 
   void set_attributes(Attributes attr)
@@ -46,11 +46,12 @@ TEST(PuttyRow, CopyConstructor)
   RowMock orig;
   orig.set_width(1);
   orig.set_cell(0, L"abc", 5678);
+  ASSERT_EQ(L"abc", orig.get_cell(0)->get_characters());
   orig.set_attributes(0x33);
 
-  RowMock row(orig);
-  ASSERT_EQ(L"abc", row.get_cell(0).get_characters());
-  ASSERT_EQ(5678, row.get_cell(0).get_attributes());
+  Row row(orig);
+  ASSERT_EQ(L"abc", row.get_cell(0)->get_characters());
+  ASSERT_EQ(5678, row.get_cell(0)->get_attributes());
   ASSERT_EQ(0x33, row.get_attributes());
 }
 
@@ -64,9 +65,17 @@ TEST(PuttyRow, Assignment)
   RowMock row;
   RowMock &res = row = orig;
   ASSERT_EQ(&res, &row);
-  ASSERT_EQ(L"abc", row.get_cell(0).get_characters());
-  ASSERT_EQ(5678, row.get_cell(0).get_attributes());
+  ASSERT_EQ(L"abc", row.get_cell(0)->get_characters());
+  ASSERT_EQ(5678, row.get_cell(0)->get_attributes());
   ASSERT_EQ(0x33, row.get_attributes());
+}
+
+TEST(PuttyRow, SetCellOnInvalidPosition)
+{
+  RowMock row;
+  row.set_width(1);
+  ASSERT_FALSE(row.set_cell(1, L"abc", 5678));
+  ASSERT_FALSE(row.get_cell(1));
 }
 
 TEST(PuttyRow, SetWidthInitial)
@@ -75,7 +84,7 @@ TEST(PuttyRow, SetWidthInitial)
   row.set_width(1);
 
   ASSERT_EQ(1, row.get_width());
-  ASSERT_EQ(L"", row.get_cell(0).get_characters());
+  ASSERT_EQ(L"", row.get_cell(0)->get_characters());
 }
 
 TEST(PuttyRow, SetWidthBigger)
@@ -87,10 +96,10 @@ TEST(PuttyRow, SetWidthBigger)
   row.set_width(2);
 
   ASSERT_EQ(2, row.get_width());
-  ASSERT_EQ(L"Hello", row.get_cell(0).get_characters());
-  ASSERT_EQ(5678, row.get_cell(0).get_attributes());
+  ASSERT_EQ(L"Hello", row.get_cell(0)->get_characters());
+  ASSERT_EQ(5678, row.get_cell(0)->get_attributes());
 
-  ASSERT_EQ(L"", row.get_cell(1).get_characters());
+  ASSERT_EQ(L"", row.get_cell(1)->get_characters());
 }
 
 TEST(PuttyRow, SetWidthSmaller)
@@ -102,8 +111,8 @@ TEST(PuttyRow, SetWidthSmaller)
   row.set_width(1);
 
   ASSERT_EQ(1, row.get_width());
-  ASSERT_EQ(L"Hello", row.get_cell(0).get_characters());
-  ASSERT_EQ(5678, row.get_cell(0).get_attributes());
+  ASSERT_EQ(L"Hello", row.get_cell(0)->get_characters());
+  ASSERT_EQ(5678, row.get_cell(0)->get_attributes());
 }
 
 TEST(PuttyRow, SetCell)
@@ -112,8 +121,8 @@ TEST(PuttyRow, SetCell)
   row.set_width(1);
   row.set_cell(0, L"abc", 5678);
 
-  ASSERT_EQ(L"abc", row.get_cell(0).get_characters());
-  ASSERT_EQ(5678, row.get_cell(0).get_attributes());
+  ASSERT_EQ(L"abc", row.get_cell(0)->get_characters());
+  ASSERT_EQ(5678, row.get_cell(0)->get_attributes());
 }
 
 TEST(PuttyRow, SetAttribute)

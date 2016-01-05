@@ -261,7 +261,8 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
   int absolute_offset = 0;
   for (unsigned row = 0; row < row_count; row++)
     {
-      state.get_row_internal(offset + (int)row).set_attributes(inst->term->disptext[row]->lattr);
+      Row *r = state.get_row_internal(offset + (int)row);
+      r->set_attributes(inst->term->disptext[row]->lattr);
       for (unsigned col = 0; col < (unsigned)inst->term->cols; col++)
         {
           int relative_offset;
@@ -359,7 +360,9 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
     return;
 
   std::wstring chr;
-  state.get_row_internal(y).set_attributes(lattr);
+  Row *row = state.get_row_internal(y);
+
+  row->set_attributes(lattr);
   for (std::wstring::const_iterator it = str.begin(); it != str.end(); ++it)
     {
       if (it != str.begin() && !is_combining_character(*it))
