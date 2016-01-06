@@ -1,3 +1,9 @@
+libtermcapparser (1.0.8) zorp-os-5.0; urgency=low
+
+  * Stability fixes
+
+ -- Robert Manner <manner@balabit.com>  Wed, 06 Jan 2016 09:33:43 +0000
+
 libtermcapparser (1.0.7) zorp-os-5.0; urgency=low
 
   * Compile fix.
