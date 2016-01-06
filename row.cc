@@ -43,10 +43,10 @@ Row::swap(Row &other)
   std::swap(cells, other.cells);
 }
 
-const Cell &
+const Cell *
 Row::get_cell(unsigned col) const
 {
-  return cells[col];
+  return col < width ? &cells[col] : 0;
 }
 
 void
@@ -69,10 +69,14 @@ Row::set_width(unsigned width)
   cells = new_cells;
 }
 
-void
+bool
 Row::set_cell(unsigned col, const std::wstring &characters, Cell::Attributes attr)
 {
+  if (col >= width)
+    return false;
+
   cells[col].set(characters, attr);
+  return true;
 }
 
 void

@@ -68,7 +68,7 @@ namespace Putty
      *
      * @param col Column position.
      */
-    const Cell &get_cell(unsigned col) const;
+    const Cell *get_cell(unsigned col) const;
 
     /**
      * Get the attributes of the row.
@@ -115,7 +115,7 @@ namespace Putty
      * @param chr Character of the cell.
      * @param attr Attributes of the cell.
      */
-    void set_cell(unsigned col, const std::wstring &characters, Cell::Attributes attr);
+    bool set_cell(unsigned col, const std::wstring &characters, Cell::Attributes attr);
 
     /**
      * Set the attributes of the row.

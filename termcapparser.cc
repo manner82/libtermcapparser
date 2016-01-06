@@ -5,10 +5,15 @@
 #include "putty/termcapparser.hh"
 #include <sstream>
 
+#include <ostream>
+
 using namespace Putty;
 
 namespace
 {
+
+  static const int CONTROL_SEQUENCE_LENGTH = 8;
+  static const char ESCAPE_CHAR = '\033';
 
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
@@ -89,11 +94,37 @@ namespace
       _Type &ref;     /**< Variable reference */
       _Type oldval;   /**< Old value of the variable (before change) */
     };
+
+
+    inline void move_on(const char *&data, int &size, int offset)
+    {
+      data = data + offset;
+      size -= offset;
+    }
+
+    inline bool is_control_sequence_partial(int data_length)
+    {
+      return data_length < CONTROL_SEQUENCE_LENGTH;
+    }
+
+    inline int get_first_control_sequence_pos(const char *data, int len)
+    {
+      int check_length = len - 1;
+      for (int pos = 0; pos < check_length; ++pos)
+        {
+          if ((data[pos] == ESCAPE_CHAR) && (data[pos + 1] == 'P'))
+            {
+              return pos;
+            }
+        }
+      return -1;
+    }
 }
 
 TermcapParser::TermcapParser(char *charset, int terminal_buffer_height)
   : enable_update_display(true),
-    terminal_buffer_height(terminal_buffer_height)
+    terminal_buffer_height(terminal_buffer_height),
+    log_callback(0)
 {
   /* Create an instance structure and initialise to zeroes */
   inst = snew(struct gui_data);
@@ -149,19 +180,52 @@ TermcapParser::~TermcapParser()
 void
 TermcapParser::data_input(const char *data, int len)
 {
-  int prev = 0;
+  const char *data_to_process = data;
+  int data_to_process_len = len;
 
-  for (int pos = 0; pos != len; ++pos)
+  if (buffered_data_input.size() > 0)
     {
-      if (data[pos] == '\033' && (pos != len - 1 && data[pos + 1] == 'P'))
-        {
-          data_input_filtered(data + prev, pos - prev);
-          pos += 7;
-          prev = pos + 1;
-        }
+      buffered_data_input.append(data, len);
+      data_to_process = buffered_data_input.c_str();
+      data_to_process_len = buffered_data_input.size();
     }
 
-  data_input_filtered(data + prev, len - prev);
+  while (data_to_process_len > 0)
+    {
+      if (data_to_process_len == 1 && data_to_process[0] == ESCAPE_CHAR)
+        {
+          buffered_data_input.resize(1);
+          buffered_data_input[0] = ESCAPE_CHAR;
+          break;
+        }
+
+      int first_control_sequence_pos = get_first_control_sequence_pos(data_to_process, data_to_process_len);
+
+      if (first_control_sequence_pos != -1)
+        {
+          data_input_filtered(data_to_process, first_control_sequence_pos);
+          move_on(data_to_process, data_to_process_len, first_control_sequence_pos);
+
+          if (is_control_sequence_partial(data_to_process_len))
+            {
+              buffered_data_input = std::string(data_to_process, data_to_process_len);
+              break;
+            }
+
+          // Skip the control sequence
+          move_on(data_to_process, data_to_process_len, CONTROL_SEQUENCE_LENGTH);
+        }
+      else // Leftover
+        {
+          data_input_filtered(data_to_process, data_to_process_len);
+
+          data_to_process = 0;
+          data_to_process_len = 0;
+        }
+
+      if (data_to_process_len <= 0)
+        buffered_data_input.clear();
+    }
 }
 
 void
@@ -169,6 +233,18 @@ TermcapParser::data_input_filtered(const char *data, int len)
 {
   /* inject input in the terminal */
   term_data(inst->term, 0, data, len);
+}
+
+void
+TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const
+{
+  bool success = state.set_cell(row, col, characters, attr);
+  if (!success)
+    {
+      std::ostringstream stream;
+      stream << "Invalid position requested to be updated; row='" << row << "', " << "col='" << col << "'";
+      log_message(stream.str());
+    }
 }
 
 void
@@ -197,7 +273,16 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
   int absolute_offset = 0;
   for (unsigned row = 0; row < row_count; row++)
     {
-      state.get_row_internal(offset + (int)row).set_attributes(inst->term->disptext[row]->lattr);
+      Row *r = state.get_row_internal(offset + (int)row);
+      if (!r)
+        {
+          std::ostringstream stream;
+          stream << "Invalid row requested to be updated; row='" << row << "', offset='" << offset << "'";
+          log_message(stream.str());
+          continue;
+        }
+
+      r->set_attributes(inst->term->disptext[row]->lattr);
       for (unsigned col = 0; col < (unsigned)inst->term->cols; col++)
         {
           int relative_offset;
@@ -210,18 +295,40 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
               relative_offset = inst->term->disptext[row]->chars[ absolute_offset ].cc_next;
               absolute_offset += relative_offset;
             } while(relative_offset != 0);
-          state.set_cell(offset + (int)row, col,
-                           characters,
-                           inst->term->disptext[row]->chars[col].attr);
+          set_cell(offset + (int)row, col, characters, inst->term->disptext[row]->chars[col].attr);
           characters.clear();
         }
     }
+}
+
+void
+TermcapParser::log_message(const std::string &message) const
+{
+  if (log_callback)
+    log_callback(message);
 }
 
 const State &
 TermcapParser::get_state() const
 {
   int buffer_line_count = sblines(inst->term);
+
+  if (buffer_line_count < 0)
+    {
+      std::ostringstream stream;
+      stream << "Negative scrollback lines received; number='" << buffer_line_count << "'";
+      log_message(stream.str());
+      buffer_line_count = 0;
+    }
+
+  if (buffer_line_count > terminal_buffer_height)
+    {
+      std::ostringstream stream;
+      stream << "Too big scrollback lines received; number='" << buffer_line_count << "'";
+      log_message(stream.str());
+      buffer_line_count = terminal_buffer_height;
+    }
+
   state.resize(inst->term->cols, inst->term->rows, buffer_line_count);
   state.set_palette(palette);
 
@@ -271,19 +378,33 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
     return;
 
   std::wstring chr;
-  state.get_row_internal(y).set_attributes(lattr);
+  Row *row = state.get_row_internal(y);
+  if (!row)
+    {
+      std::ostringstream stream;
+      stream << "Invalid row requested to be updated; row='" << y << "'";
+      log_message(stream.str());
+      return;
+    }
+
+  row->set_attributes(lattr);
   for (std::wstring::const_iterator it = str.begin(); it != str.end(); ++it)
     {
       if (it != str.begin() && !is_combining_character(*it))
         {
-          state.set_cell(y, x, chr, attr);
+          set_cell(y, x, chr, attr);
           ++x;
           chr.clear();
-
         }
       chr.push_back(*it);
     }
 
   if (!chr.empty())
-    state.set_cell(y, x, chr, attr);
+    set_cell(y, x, chr, attr);
+}
+
+void
+TermcapParser::set_log_callback(LogCallback log_callback)
+{
+  this->log_callback = log_callback;
 }
