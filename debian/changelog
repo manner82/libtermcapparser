@@ -1,3 +1,9 @@
+libtermcapparser (1.0.8bb1) precise; urgency=low
+
+  * Balabit patched version
+
+ -- Botond Borsits <botond.borsits@balabit.com>  Wed, 02 Mar 2016 15:32:35 +0100
+
 libtermcapparser (1.0.8) zorp-os-5.0; urgency=low
 
   * Stability fixes
