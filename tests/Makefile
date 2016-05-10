@@ -1,5 +1,5 @@
 CXXFLAGS= -I$(PREFIX)/include -O0 -g -Wall -I..
-LDFLAGS = -L$(PREFIX)/lib -lpthread -ltermcapparser -lgtest -L.. -L/usr/lib
+LDFLAGS = -L$(PREFIX)/lib -lpthread -ltermcapparser -L.. -L/usr/lib -lgmock -lgtest -lpthread
 OBJECTS = test.o cell.o row.o state.o palette.o termcapparser.o
 
 all: test runtest
