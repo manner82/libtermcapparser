@@ -1,0 +1,13 @@
+include Makefile.head
+
+CFLAGS = $(CFLAGS_COMMON) -I${XPATH}/include/ -I./windows/ -D_WINDOWS
+
+TARGET = termcapparser.dll
+TARGET_OS = win32
+
+C_OBJS = $(C_OBJS_COMMON) windows/winucs.c
+
+CC = ${XTYPE}-gcc
+CXX = ${XTYPE}-g++
+
+include Makefile.tail
