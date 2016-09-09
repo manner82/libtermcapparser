@@ -108,7 +108,7 @@ int wc_to_mb(int codepage, int flags, wchar_t *wcstr, int wclen,
 /*
  * Return value is TRUE if pterm is to run in direct-to-font mode.
  */
-int init_ucs(struct unicode_data *ucsdata, char *linecharset,
+int init_ucs(struct unicode_data *ucsdata, const char *linecharset,
 	     int utf8_override, int font_charset, int vtmode)
 {
     int i, ret = 0;
@@ -265,7 +265,7 @@ const char *cp_enumerate(int index)
     return charset_to_localenc(charset);
 }
 
-int decode_codepage(char *cp_name)
+int decode_codepage(const char *cp_name)
 {
     if (!*cp_name)
 	return CS_NONE;		       /* use font encoding */

@@ -202,7 +202,7 @@ TEST(TestTermcapParser, FilterControlSequenceBuffering1)
   const char testdata[] = "AB\033PCDEFGHIJKLM";
   TermcapParser parser("UTF-8");
 
-  for (int i = 0; i < sizeof(testdata); ++i)
+  for (int i = 0; i < (int)sizeof(testdata); ++i)
     parser.data_input(testdata + i, 1);
 
   const State &state = parser.get_state();
@@ -248,7 +248,7 @@ TEST(TestTermcapParser, FilterControlSequenceEscapeCharInTheMiddle)
   const char testdata[] = "AB\033PC\033EFGHIJKLM";
   TermcapParser parser("UTF-8");
 
-  for (int i = 0; i < sizeof(testdata); ++i)
+  for (int i = 0; i < (int)sizeof(testdata); ++i)
     parser.data_input(testdata + i, 1);
 
   const State &state = parser.get_state();

@@ -442,10 +442,6 @@ init_ucs(struct unicode_data *ucsdata, const char *line_codepage,
 {
     int i, j;
     int used_dtf = 0;
-    char tbuf[256];
-
-    for (i = 0; i < 256; i++)
-	tbuf[i] = i;
 
     /* Decide on the Line and Font codepages */
     ucsdata->line_codepage = decode_codepage(line_codepage);
@@ -1010,9 +1006,9 @@ int check_compose(int first, int second)
     return check_compose_internal(first, second, 0);
 }
 
-int decode_codepage(char *cp_name)
+int decode_codepage(const char *cp_name)
 {
-    char *s, *d;
+    const char *s, *d;
     const struct cp_list_item *cpi;
     int codepage = -1;
     CPINFO cpinfo;

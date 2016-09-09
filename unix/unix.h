@@ -163,7 +163,7 @@ int cloexec(int);
  * Exports from unicode.c.
  */
 struct unicode_data;
-int init_ucs(struct unicode_data *ucsdata, char *line_codepage,
+int init_ucs(struct unicode_data *ucsdata, const char *line_codepage,
 	     int utf8_override, int font_charset, int vtmode);
 
 /*

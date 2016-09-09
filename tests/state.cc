@@ -34,7 +34,7 @@ public:
     state->resize(1024, 768, 128);
     state->set_palette(palette);
 
-    for (int row = -128; row != state->get_height(); ++row)
+    for (int row = -128; row != (int)state->get_height(); ++row)
       {
         for (unsigned col = 0; col != state->get_width(); ++col)
           {
@@ -71,7 +71,7 @@ TEST_F(TestState, BufferSize)
 
 TEST_F(TestState, GetCell)
 {
-  for (int row = -128; row != state->get_height(); ++row)
+  for (int row = -128; row != (int)state->get_height(); ++row)
     {
       for (unsigned col = 0; col != state->get_width(); ++col)
         {
@@ -103,7 +103,7 @@ TEST_F(TestState, SetCellForInvalidPosition)
 
 TEST_F(TestState, GetRow)
 {
-  for (int row = -128; row != state->get_height(); ++row)
+  for (int row = -128; row != (int)state->get_height(); ++row)
     {
       const Row *termrow = state->get_row(row);
       ASSERT_TRUE(termrow);
@@ -127,8 +127,8 @@ TEST_F(TestState, GetPalette)
 TEST_F(TestState, ResizeBigger)
 {
   int old_height = state->get_height();
-  int old_width = state->get_width();
-  int old_buffer_size = state->get_buffer_size();
+  unsigned old_width = state->get_width();
+  unsigned old_buffer_size = state->get_buffer_size();
 
   state->resize(2048, 1024, 256);
 
@@ -150,7 +150,7 @@ TEST_F(TestState, ResizeSmaller)
 {
   state->resize(512, 128, 16);
 
-  for (int row = -16; row != state->get_height(); ++row)
+  for (int row = -16; row != (int)state->get_height(); ++row)
     {
       const Row *termrow = state->get_row(row);
       ASSERT_TRUE(termrow);

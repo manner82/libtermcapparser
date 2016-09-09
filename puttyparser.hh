@@ -42,7 +42,7 @@ void term_size(Terminal *term, int newrows, int newcols, int newsavelines);
 void term_update(Terminal *term);
 void term_provide_logctx(Terminal *term, void *logctx);
 /* Unicode support */
-int init_ucs(struct unicode_data *ucsdata, char *linecharset,
+int init_ucs(struct unicode_data *ucsdata, const char *linecharset,
              int utf8_override, int font_charset, int vtmode);
 /* memory allocation tools */
 void *safemalloc(size_t n, size_t size);
