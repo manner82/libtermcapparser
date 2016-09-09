@@ -1,0 +1,11 @@
+include Makefile.head
+
+TARGET_OS=linux
+
+CFLAGS = $(CFLAGS_COMMON) -I./unix -fPIC
+
+TARGET=libtermcapparser.so
+
+C_OBJS = $(C_OBJS_COMMON) unix/uxmisc.c unix/uxucs.c
+
+include Makefile.tail
