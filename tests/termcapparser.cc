@@ -16,9 +16,9 @@ TEST(TestTermcapParser, Initialize)
   // Each cell should be filled with spaces initially:
   //   character = 0x20
   //   attribute = default bg and default fg
-  for (int row = -100; row < state.get_height(); ++row)
+  for (int row = 0; row < (int)state.get_height(); ++row)
     {
-      for (unsigned col = 0; col < state.get_height(); ++col)
+      for (unsigned col = 0; col < state.get_width(); ++col)
         {
           const Cell *cell = state.get_cell(row, col);
           ASSERT_TRUE(cell);
