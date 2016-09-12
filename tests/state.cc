@@ -39,7 +39,7 @@ public:
         for (unsigned col = 0; col != state->get_width(); ++col)
           {
             std::wstring characters;
-            characters.push_back( (ABS(row) << 16) | col );
+            characters.push_back( (ABS(row) << 8) | col );
             state->set_cell(row, col, characters, (col << 16) | ABS(row));
           }
       }
@@ -77,7 +77,7 @@ TEST_F(TestState, GetCell)
         {
           const Cell *cell = state->get_cell(row, col);
           ASSERT_TRUE(cell);
-          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(wchar_t((ABS(row) << 8) | col), cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
           ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
@@ -111,7 +111,7 @@ TEST_F(TestState, GetRow)
         {
           const Cell *cell = termrow->get_cell(col);
           ASSERT_TRUE(cell);
-          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(wchar_t((ABS(row) << 8) | col), cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
           ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
@@ -140,7 +140,7 @@ TEST_F(TestState, ResizeBigger)
         {
           const Cell *cell = termrow->get_cell(col);
           ASSERT_TRUE(cell);
-          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(wchar_t((ABS(row) << 8) | col), cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
           ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
@@ -159,7 +159,7 @@ TEST_F(TestState, ResizeSmaller)
           const Cell *cell = termrow->get_cell(col);
           ASSERT_TRUE(cell);
 
-          ASSERT_EQ((ABS(row) << 16) | col, cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
+          ASSERT_EQ(wchar_t((ABS(row) << 8) | col), cell->get_characters()[0]) << "Invalid cell character in row " << row << " column " << col;
           ASSERT_EQ(((col << 16) | ABS(row)) & Cell::ValidMask, cell->get_attributes()) << "Invalid cell attribute in row " << row << " column " << col;
         }
     }
