@@ -6,7 +6,7 @@ namespace Putty
   class TermcapParser;
 }
 
-#include <features.h>
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
