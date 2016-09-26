@@ -391,7 +391,9 @@ struct cp_list_item {
 
 static const struct cp_list_item cp_list[] = {
     {"ISO-8859-1:1998 (Latin-1, West Europe)", 0, 96, iso_8859_1},
+    {"LATIN1:1998 (Latin-1, West Europe)", 0, 96, iso_8859_1},
     {"ISO-8859-2:1999 (Latin-2, East Europe)", 0, 96, iso_8859_2},
+    {"LATIN2:1999 (Latin-2, East Europe)", 0, 96, iso_8859_2},
     {"ISO-8859-3:1999 (Latin-3, South Europe)", 0, 96, iso_8859_3},
     {"ISO-8859-4:1998 (Latin-4, North Europe)", 0, 96, iso_8859_4},
     {"ISO-8859-5:1999 (Latin/Cyrillic)", 0, 96, iso_8859_5},
