@@ -6,7 +6,8 @@ all: test runtest
 
 .PHONY:
 runtest: test
-	LD_LIBRARY_PATH=$(PREFIX)/lib:${LD_LIBRARY_PATH} ./test
+	mkdir -p ../logs
+	LD_LIBRARY_PATH=$(PREFIX)/lib:${LD_LIBRARY_PATH} ./test --gtest_output=xml:../logs/tests-linux.xml
 
 .PHONY:
 clean:

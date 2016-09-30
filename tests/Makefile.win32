@@ -9,9 +9,12 @@ all: test runtest
 
 .PHONY:
 runtest: test
+	mkdir -p ../logs
+
 	# wine needs the dll dependencies here :(
 	cp -f "${PREFIX}/lib/termcapparser.dll" .
-	wine test.exe
+
+	wine test.exe --gtest_output=xml:../logs/tests-win32.xml
 
 .PHONY:
 clean:
