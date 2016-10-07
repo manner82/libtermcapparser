@@ -121,7 +121,7 @@ namespace
     }
 }
 
-TermcapParser::TermcapParser(char *charset, int terminal_buffer_height)
+TermcapParser::TermcapParser(const char *charset, int terminal_buffer_height)
   : enable_update_display(true),
     terminal_buffer_height(terminal_buffer_height),
     log_callback(0)

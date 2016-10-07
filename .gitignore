@@ -1,4 +1,4 @@
-Makefile.dep
+Makefile.*.dep
 *.o
 *.orig
 *.rej
@@ -8,3 +8,6 @@ Makefile.dep
 *.bak
 *~
 /libtermcapparser.so
+termcapparser.dll
+tests/test.exe
+tests/test

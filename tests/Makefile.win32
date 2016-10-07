@@ -1,0 +1,27 @@
+CXXFLAGS= -I$(PREFIX)/include -O0 -g -Wall -I..
+LDFLAGS = -L$(PREFIX)/lib -ltermcapparser -L{XPATH}/lib -lgmock -lgtest -lpthread
+OBJECTS = test.o cell.o row.o state.o palette.o termcapparser.o
+
+CC = ${XTYPE}-gcc
+CXX = ${XTYPE}-g++
+
+all: test runtest
+
+.PHONY:
+runtest: test
+	mkdir -p ../logs
+
+	# wine needs the dll dependencies here :(
+	cp -f "${PREFIX}/lib/termcapparser.dll" .
+
+	wine test.exe --gtest_output=xml:../logs/tests-win32.xml
+
+.PHONY:
+clean:
+	rm -f $(OBJECTS) test.exe *.dll
+
+test: $(OBJECTS)
+	$(CXX) -o test.exe $(OBJECTS) $(LDFLAGS)
+
+%.o: %.cc
+	$(CXX) -c -o $@ $< $(CXXFLAGS)

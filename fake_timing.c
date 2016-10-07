@@ -15,9 +15,6 @@
 #include <putty.h>
 
 
-static void init_timers(void)
-{ }
-
 long schedule_timer(int ticks, timer_fn_t fn, void *ctx)
 {
     return 0;

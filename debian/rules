@@ -13,12 +13,12 @@ endif
 
 build:
 	dh_testdir
-	$(MAKE) dep
-	$(MAKE) libtermcapparser.so
+	$(MAKE) linux-dep
+	$(MAKE) linux-libtermcapparser.so
 
 clean:
 	dh_testdir
-	-$(MAKE) clean
+	-$(MAKE) linux-clean
 	dh_clean
 
 

@@ -22,10 +22,10 @@ case "$cmd" in
     # No bootstrap
     ;;
   configure)
-    make PREFIX=$ZWA_MODULE_INSTALL_DIR dep
+    make -f Makefile.linux PREFIX=$ZWA_MODULE_INSTALL_DIR dep
     ;;
   make)
-    make PREFIX=$ZWA_MODULE_INSTALL_DIR "$@"
+    make -f Makefile.linux PREFIX=$ZWA_MODULE_INSTALL_DIR "$@"
     ;;
   *)
     echo "Unknown command: '$cmd'." >&2

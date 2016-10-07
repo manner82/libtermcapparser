@@ -16,9 +16,9 @@ TEST(TestTermcapParser, Initialize)
   // Each cell should be filled with spaces initially:
   //   character = 0x20
   //   attribute = default bg and default fg
-  for (int row = -100; row < state.get_height(); ++row)
+  for (int row = 0; row < (int)state.get_height(); ++row)
     {
-      for (unsigned col = 0; col < state.get_height(); ++col)
+      for (unsigned col = 0; col < state.get_width(); ++col)
         {
           const Cell *cell = state.get_cell(row, col);
           ASSERT_TRUE(cell);
@@ -202,7 +202,7 @@ TEST(TestTermcapParser, FilterControlSequenceBuffering1)
   const char testdata[] = "AB\033PCDEFGHIJKLM";
   TermcapParser parser("UTF-8");
 
-  for (int i = 0; i < sizeof(testdata); ++i)
+  for (int i = 0; i < (int)sizeof(testdata); ++i)
     parser.data_input(testdata + i, 1);
 
   const State &state = parser.get_state();
@@ -248,7 +248,7 @@ TEST(TestTermcapParser, FilterControlSequenceEscapeCharInTheMiddle)
   const char testdata[] = "AB\033PC\033EFGHIJKLM";
   TermcapParser parser("UTF-8");
 
-  for (int i = 0; i < sizeof(testdata); ++i)
+  for (int i = 0; i < (int)sizeof(testdata); ++i)
     parser.data_input(testdata + i, 1);
 
   const State &state = parser.get_state();

@@ -1,0 +1,48 @@
+OBJECTS = $(notdir $(CXX_OBJS:.cc=.o) $(C_OBJS:.c=.o))
+CCFLAGS = $(CFLAGS)
+MAKEFILE_DEP = Makefile.$(TARGET_OS).dep
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS)
+
+$(CXX_OBJS:.cc=.o):
+	$(CXX) $(COMPAT) $(CCFLAGS) -c $<
+
+$(notdir $(C_OBJS:.c=.o)):
+	$(CC) $(COMPAT) $(CFLAGS) $(XFLAGS) -c $<
+
+
+install: $(TARGET)
+	mkdir -p $(DESTDIR)$(libdir)
+	mkdir -p $(DESTDIR)$(incdir)/$(HEADER_DIR)
+	$(INSTALL) -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(TARGET)
+	$(INSTALL) -m 644 $(HEADERS) -t $(DESTDIR)$(incdir)/$(HEADER_DIR)
+
+uninstall:
+	rm -f $(DESTDIR)$(libdir)/$(TARGET)
+	rm -f $(DESTDIR)$(incdir)/$(HEADERS)
+	rmdir $(DESTDIR)$(incdir)/$(HEADER_DIR) 2>/dev/null || true
+	rmdir $(DESTDIR)$(libdir) 2>/dev/null || true
+
+install-strip:
+	$(MAKE) $(MFLAGS) install INSTALL="$(INSTALL) -s"
+
+check: install
+	$(MAKE) $(MFLAGS) -C tests -f Makefile.$(TARGET_OS)
+
+clean:
+	rm -f $(OBJECTS) $(TARGET)
+	$(MAKE) $(MFLAGS) -C tests -f Makefile.$(TARGET_OS) clean
+
+distclean: clean
+	rm -f $(MAKEFILE_DEP)
+
+NODEP_TARGETS =
+
+dep: $(C_OBJS) $(CXX_OBJS)
+	$(CC) -MM $(COMPAT) $(CFLAGS) $(XFLAGS) $^ >$(MAKEFILE_DEP)
+ifeq ($(filter $(MAKECMDGOALS),$(NODEP_TARGETS)),)
+-include $(MAKEFILE_DEP)
+endif
