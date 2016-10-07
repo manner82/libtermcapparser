@@ -1,3 +1,9 @@
+libtermcapparser (1.0.9) xenial; urgency=low
+
+  * Crosscompile support (win32 on linux)
+
+ -- Tamas Domok <tamas.domok@balabit.com>  Fri, 07 Oct 2016 13:50:00 +0100
+
 libtermcapparser (1.0.8bb1) precise; urgency=low
 
   * Balabit patched version
