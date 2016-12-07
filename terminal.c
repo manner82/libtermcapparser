@@ -5817,10 +5817,10 @@ void term_mouse(Terminal *term, Mouse_Button braw, Mouse_Button bcooked,
 	     * interchange x and y coordinates (if the user has
 	     * dragged in the -x and +y directions, or vice versa).
 	     */
-	    term->selstart.x = min(term->selanchor.x, selpoint.x);
-	    term->selend.x = 1+max(term->selanchor.x, selpoint.x);
-	    term->selstart.y = min(term->selanchor.y, selpoint.y);
-	    term->selend.y =   max(term->selanchor.y, selpoint.y);
+	    term->selstart.x = pmin(term->selanchor.x, selpoint.x);
+	    term->selend.x = 1+pmax(term->selanchor.x, selpoint.x);
+	    term->selstart.y = pmin(term->selanchor.y, selpoint.y);
+	    term->selend.y =   pmax(term->selanchor.y, selpoint.y);
 	}
 	sel_spread(term);
     } else if ((bcooked == MBT_SELECT || bcooked == MBT_EXTEND) &&

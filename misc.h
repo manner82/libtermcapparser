@@ -78,13 +78,9 @@ void debug_memdump(void *buf, int len, int L);
 #define lenof(x) ( (sizeof((x))) / (sizeof(*(x))))
 #endif
 
-#ifndef max
-inline int max(int x, int y) { return ( (x) > (y) ? (x) : (y) ); }
-#endif
+#define pmax(x,y) ( (x) > (y) ? (x) : (y) )
 
-#ifndef min
-inline int min(int x, int y) { return ( (x) < (y) ? (x) : (y) ); }
-#endif
+#define pmin(x,y) ( (x) < (y) ? (x) : (y) )
 
 #define GET_32BIT_LSB_FIRST(cp) \
   (((unsigned long)(unsigned char)(cp)[0]) | \
