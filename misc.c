@@ -372,14 +372,14 @@ void bufchain_add(bufchain *ch, const void *data, int len)
     ch->buffersize += len;
 
     if (ch->tail && ch->tail->buflen < BUFFER_GRANULE) {
-	int copylen = min(len, BUFFER_GRANULE - ch->tail->buflen);
+	int copylen = pmin(len, BUFFER_GRANULE - ch->tail->buflen);
 	memcpy(ch->tail->buf + ch->tail->buflen, buf, copylen);
 	buf += copylen;
 	len -= copylen;
 	ch->tail->buflen += copylen;
     }
     while (len > 0) {
-	int grainlen = min(len, BUFFER_GRANULE);
+	int grainlen = pmin(len, BUFFER_GRANULE);
 	struct bufchain_granule *newbuf;
 	newbuf = snew(struct bufchain_granule);
 	newbuf->bufpos = 0;
