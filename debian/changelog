@@ -1,3 +1,9 @@
+libtermcapparser (1.0.10) xenial; urgency=low
+
+  * Compile fix
+
+ -- Tamas Domok <tamas.domok@balabit.com>  Wed, 04 Jan 2017 15:30:00 +0100
+
 libtermcapparser (1.0.9) xenial; urgency=low
 
   * Crosscompile support (win32 on linux)
