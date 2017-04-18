@@ -17,6 +17,7 @@ const Cell::Attributes Cell::DefaultAttributes = (Cell::DefaultForeground << Cel
     (Cell::DefaultBackground << Cell::BgColorShift);
 
 Cell::Cell()
+  : attr(DefaultAttributes)
 {}
 
 Cell::Cell(const std::wstring &characters, Attributes attr)
