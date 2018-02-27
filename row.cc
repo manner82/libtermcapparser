@@ -1,7 +1,5 @@
 #include "putty/row.hh"
 
-#include <stdio.h>
-
 using namespace Putty;
 
 Row::Row()
@@ -20,11 +18,7 @@ Row::Row(const Row &other)
     {
       cells = new Cell[width];
       for (unsigned i = 0; i < width; ++i)
-        {
-          cells[i] = other.cells[i];
-        }
-      if (cells[0].is_changed())
-        printf("cell 0 has changed during copying\n");
+        cells[i] = other.cells[i];
     }
 }
 
@@ -39,17 +33,6 @@ Row::operator=(const Row &other)
   Row tmp(other);
   tmp.swap(*this);
   return *this;
-}
-
-void
-Row::clear_changed()
-{
-  Cell *cell = cells;
-  for (int cell_pos = 0; cell_pos < get_width(); ++cell_pos)
-    {
-      cell->set_changed(false);
-      ++cell;
-    }
 }
 
 void

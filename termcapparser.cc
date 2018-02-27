@@ -238,11 +238,6 @@ TermcapParser::data_input_filtered(const char *data, int len)
 void
 TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const
 {
-  if (row == 0 && col == 0)
-    {
-      printf("Changing (%p) from '%ls' to '%ls'\n", &(state.get_cell(row, col)->get_characters()), state.get_cell(row, col)->get_characters().c_str(), characters.c_str());
-      state.get_cell(row, col)->track = true;
-    }
   bool success = state.set_cell(row, col, characters, attr);
   if (!success)
     {
@@ -340,7 +335,6 @@ TermcapParser::get_state() const
   /* update terminal display buffer */
   term_update(inst->term);
 
-#if 0
   {
     /* write buffer content */
     int offset;
@@ -351,7 +345,6 @@ TermcapParser::get_state() const
     /* write remainder buffer content which is less than a complete terminal screen */
     copy_term_content_to_cache(offset, -offset);
   }
-#endif
 
   state.set_cursor(inst->term->cursor_on == 1, inst->term->curs.x, inst->term->curs.y);
 
@@ -407,9 +400,7 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
     }
 
   if (!chr.empty())
-    {
-      set_cell(y, x, chr, attr);
-    }
+    set_cell(y, x, chr, attr);
 }
 
 void

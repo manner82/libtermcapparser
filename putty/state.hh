@@ -106,8 +106,6 @@ namespace Putty
     void set_palette(const Palette &palette)
     { this->palette = palette; }
 
-    void clear_changed() const;
-
   protected:
     /**
      * Create an empty state.
@@ -189,7 +187,7 @@ namespace Putty
     int cursor_y;
 
     /** List of rows. */
-    mutable Row *rows;
+    Row *rows;
 
     /** Palette of the state */
     Palette palette;
