@@ -55,6 +55,8 @@ namespace Putty
      */
     Row &operator=(const Row &other);
 
+    void clear_changed();
+
     /**
      * Get the row width.
      *
