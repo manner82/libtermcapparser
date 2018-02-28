@@ -2,6 +2,7 @@
 #include "putty/row.hh"
 
 #include <sstream>
+#include <stdio.h>
 
 using namespace Putty;
 
@@ -89,6 +90,18 @@ const Row *
 State::get_row(int row) const
 {
   return is_invalid_row_value(row) ? 0 : &rows[row + buffer_size];
+}
+
+void
+State::clear_changed() const
+{
+  printf("XXX clear changed %p\n", this);
+  Row *row = rows;
+  for (unsigned row_pos = 0; row_pos < (height + buffer_size); ++row_pos)
+    {
+      row->clear_changed();
+      ++row;
+    }
 }
 
 bool
