@@ -20,6 +20,11 @@ namespace Putty
 
   public:
     /**
+     * Create an empty state.
+     */
+    State();
+
+    /**
      * Copy another state.
      */
     State(const State &other);
@@ -107,10 +112,6 @@ namespace Putty
     { this->palette = palette; }
 
   protected:
-    /**
-     * Create an empty state.
-     */
-    State();
 
     void swap(State &other);
 
