@@ -6,6 +6,7 @@
 #include <putty/palette.hh>
 
 #include <string>
+#include <vector>
 
 namespace Putty
 {
@@ -60,6 +61,8 @@ namespace Putty
     inline bool is_alternate_screen() const
     { return alternate_screen; }
 
+    long long get_scroll_depth() const;
+
     /**
      * Get the character and attribute pair (a Cell object) at any given position.
      * Negative row number means buffer content zero or positive means screen content.
@@ -112,6 +115,9 @@ namespace Putty
     { this->palette = palette; }
 
     void clear_changed() const;
+
+    void insert_rows(int row_position, int count);
+    void delete_rows(int count);
 
   protected:
 
@@ -173,6 +179,8 @@ namespace Putty
     void resize_display(unsigned a_width, unsigned a_height)
     { resize(a_width, a_height, buffer_size); }
 
+    void scroll(int count);
+
   private:
     /** Width of the terminal */
     unsigned width;
@@ -190,10 +198,12 @@ namespace Putty
     int cursor_y;
 
     /** List of rows. */
-    mutable Row *rows;
+    mutable std::vector< Row > rows;
 
     /** Palette of the state */
     Palette palette;
+
+    long long scroll_depth;
 
   private:
     /**
@@ -201,7 +211,7 @@ namespace Putty
      *
      * @return true if the coordinates are invalid
      */
-    bool is_invalid_row_value(int row) const;
+    bool is_valid_row_value(int row) const;
 
     bool is_valid_cell(int row, unsigned column) const;
   };

@@ -23,8 +23,6 @@ Row::Row(const Row &other)
         {
           cells[i] = other.cells[i];
         }
-      if (cells[0].is_changed())
-        printf("cell 0 has changed during copying\n");
     }
 }
 
