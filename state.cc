@@ -98,7 +98,7 @@ State::get_row(int row) const
 void
 State::clear_changed() const
 {
-  printf("XXX clear changed %p\n", this);
+  //printf("XXX clear changed %p\n", this);
   for (unsigned i = 0; i < rows.size(); ++i)
     {
       rows[i].clear_changed();
@@ -108,16 +108,28 @@ State::clear_changed() const
 void
 State::scroll(int count)
 {
-  if (count <= 0)
+  if (count == 0)
     return;
 
   Row row;
   row.set_width(width);
 
-  rows = std::vector<Row>(rows.begin() + count, rows.end());
-
-  for (int i=0; i<count; ++i)
-    rows.push_back(row);
+  if (count < 0)
+    {
+      for (int i = 0; i > count; --i)
+        {
+          rows.push_front(row);
+          rows.pop_back();
+        }
+    }
+  else
+    {
+      for (int i = 0; i < count; ++i)
+        {
+          rows.pop_front();
+          rows.push_back(row);
+        }
+    }
 
   scroll_depth += count;
 }
@@ -155,13 +167,13 @@ State::get_row_internal(int row)
 void
 State::resize(unsigned a_width, unsigned a_height, unsigned a_buffer_size)
 {
-  printf("Resize request: %u %u %u\n", a_width, a_height, a_buffer_size);
+  //printf("Resize request: %u %u %u\n", a_width, a_height, a_buffer_size);
   // If the dimensions don't change, leave this alone
   if (a_width == width && height == a_height && buffer_size == a_buffer_size)
     return;
 
-  std::vector< Row > new_rows;
-  printf("Resizing from %u %u %u\n", width, height, buffer_size);
+  std::deque< Row > new_rows;
+  //printf("Resizing from %u %u %u\n", width, height, buffer_size);
   for (int i = -a_buffer_size; i < (int)a_height; ++i)
     {
       Row row = is_valid_row_value(i) ? rows[i + buffer_size] : Row();

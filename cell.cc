@@ -10,7 +10,6 @@ const Cell::Attributes Cell::FgColorMask = 0x0001FFU;
 const int Cell::FgColorShift = 0;
 const Cell::Attributes Cell::BgColorMask = 0x03FE00U;
 const int Cell::BgColorShift = 9;
-static const Cell::Attributes ChangeMask = (1 << Cell::BgColorShift);
 const Cell::Attributes Cell::InvalidColor = 0x03FFFFU;
 const Cell::Attributes Cell::ValidMask = Cell::FlagMask | Cell::BgColorMask | Cell::FgColorMask;
 const Cell::Color Cell::DefaultForeground = 256 + Cell::DEFAULT_FOREGROUND;
@@ -21,13 +20,13 @@ const Cell::Attributes Cell::DefaultAttributes = (Cell::DefaultForeground << Cel
 
 Cell::Cell()
   : attr(Cell::DefaultAttributes),
-    track(false)
+    changed(true)
 {
   set_changed(true);
 }
 
 Cell::Cell(const std::wstring &characters, Attributes attr)
-  : track(false)
+  : changed(true)
 {
   set(characters, attr);
   set_changed(true);
@@ -36,7 +35,7 @@ Cell::Cell(const std::wstring &characters, Attributes attr)
 Cell::Cell(const Cell &other)
   : characters(other.characters),
     attr(other.attr),
-    track(other.track)
+    changed(other.changed)
 {
 }
 
@@ -45,7 +44,7 @@ Cell::operator=(const Cell &other)
 {
   characters = other.characters;
   attr = other.attr;
-  track = other.track;
+  changed = other.changed;
   return *this;
 }
 
@@ -70,27 +69,17 @@ Cell::set_characters(const std::wstring &characters)
 void
 Cell::set_attributes(Cell::Attributes attributes)
 {
-  this->attr = (attributes & ValidMask) | (this->attr & ChangeMask);
+  this->attr = attributes & ValidMask;
 }
 
 void
 Cell::set_changed(bool is_changed)
 {
-  if (track)
-    printf("Marking changed %p %d\n", this, is_changed);
-
-  if (is_changed)
-    {
-      this->attr = this->attr | ChangeMask;
-    }
-  else
-    {
-      this->attr = this->attr & (~ChangeMask);
-    }
+  changed = is_changed;
 }
 
 bool
 Cell::is_changed() const
 {
-  return this->attr & ChangeMask;
+  return changed;
 }

@@ -6,7 +6,7 @@
 #include <putty/palette.hh>
 
 #include <string>
-#include <vector>
+#include <deque>
 
 namespace Putty
 {
@@ -198,7 +198,7 @@ namespace Putty
     int cursor_y;
 
     /** List of rows. */
-    mutable std::vector< Row > rows;
+    mutable std::deque< Row > rows;
 
     /** Palette of the state */
     Palette palette;

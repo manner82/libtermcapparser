@@ -201,11 +201,6 @@ TermcapParser::data_input_filtered(const char *data, int len)
 void
 TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const
 {
-  if (row == 0 && col == 0)
-    {
-      printf("Changing (%p) from '%ls' to '%ls'\n", &(state.get_cell(row, col)->get_characters()), state.get_cell(row, col)->get_characters().c_str(), characters.c_str());
-      state.get_cell(row, col)->track = true;
-    }
   bool success = state.set_cell(row, col, characters, attr);
   if (!success)
     {
@@ -303,7 +298,7 @@ TermcapParser::get_state() const
   /* update terminal display buffer */
   term_update(inst->term);
 
-#if 0
+#if 1
   {
     /* write buffer content */
     int offset;
@@ -375,7 +370,7 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
 void
 TermcapParser::scroll(int topline, int bottomline, int lines)
 {
-  printf("XXX scroll request %d %d %d\n", topline, bottomline, lines);
+  //printf("XXX scroll request %d %d %d\n", topline, bottomline, lines);
   state.scroll(lines);
 }
 

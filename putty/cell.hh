@@ -205,7 +205,7 @@ public:
     Attributes attr;
 
   public:
-    bool track;
+    bool changed;
   };
 
 } // namespace Putty
