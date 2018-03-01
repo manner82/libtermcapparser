@@ -2,7 +2,6 @@
 #include "putty/row.hh"
 
 #include <sstream>
-#include <stdio.h>
 
 using namespace Putty;
 
@@ -14,7 +13,7 @@ State::State()
     cursor_enabled(false),
     cursor_x(0),
     cursor_y(0),
-    scroll_depth(0)
+    rows(0)
 {
 }
 
@@ -26,10 +25,12 @@ State::State(const State &other)
     cursor_enabled(other.cursor_enabled),
     cursor_x(other.cursor_x),
     cursor_y(other.cursor_y),
-    rows(other.rows),
-    palette(other.palette),
-    scroll_depth(other.scroll_depth)
+    rows(0),
+    palette(other.palette)
 {
+  rows = new Row[height + buffer_size];
+  for (unsigned row = 0; row < (height + buffer_size); ++row)
+    rows[row] = other.rows[row];
 }
 
 State &
@@ -38,12 +39,6 @@ State::operator=(const State &other)
   State tmp(other);
   tmp.swap(*this);
   return *this;
-}
-
-long long
-State::get_scroll_depth() const
-{
-  return scroll_depth;
 }
 
 void
@@ -58,80 +53,42 @@ State::swap(State &other)
   std::swap(cursor_y, other.cursor_y);
   std::swap(palette, other.palette);
   std::swap(rows, other.rows);
-  std::swap(scroll_depth, other.scroll_depth);
 }
 
 State::~State()
 {
+  if (rows)
+    delete [] rows;
 }
 
 bool
-State::is_valid_row_value(int row) const
+State::is_invalid_row_value(int row) const
 {
-  return row >= -(int)(buffer_size) && row < (int)height;
+  return (rows == 0) || ((int)(row - height) >= 0 || (int)(row + buffer_size) < 0);
 }
 
 bool
 State::is_valid_cell(int row, unsigned column) const
 {
-  return is_valid_row_value(row) && column < width;
+  return !is_invalid_row_value(row) && column < width;
 }
 
 const Cell *
 State::get_cell(int row, unsigned col) const
 {
-  return this->is_valid_cell(row, col) ? &get_row(row)->cells[col] : 0;
+  return this->is_valid_cell(row, col) ? &rows[row + buffer_size].cells[col] : 0;
 }
 
 Cell *
 State::get_cell(int row, unsigned col)
 {
-  return is_valid_cell(row, col) ? &get_row(row)->cells[col] : 0;
+  return is_valid_cell(row, col) ? &rows[row + buffer_size].cells[col] : 0;
 }
 
 const Row *
 State::get_row(int row) const
 {
-  return is_valid_row_value(row) ? &rows[row + buffer_size] : 0;
-}
-
-void
-State::clear_changed() const
-{
-  //printf("XXX clear changed %p\n", this);
-  for (unsigned i = 0; i < rows.size(); ++i)
-    {
-      rows[i].clear_changed();
-    }
-}
-
-void
-State::scroll(int count)
-{
-  if (count == 0)
-    return;
-
-  Row row;
-  row.set_width(width);
-
-  if (count < 0)
-    {
-      for (int i = 0; i > count; --i)
-        {
-          rows.push_front(row);
-          rows.pop_back();
-        }
-    }
-  else
-    {
-      for (int i = 0; i < count; ++i)
-        {
-          rows.pop_front();
-          rows.push_back(row);
-        }
-    }
-
-  scroll_depth += count;
+  return is_invalid_row_value(row) ? 0 : &rows[row + buffer_size];
 }
 
 bool
@@ -161,30 +118,31 @@ State::set_cursor(bool enabled, int x, int y)
 Row *
 State::get_row_internal(int row)
 {
-  return is_valid_row_value(row) ? &rows[row + buffer_size] : 0;
+  return is_invalid_row_value(row) ? 0 : &rows[row + buffer_size];
 }
 
 void
 State::resize(unsigned a_width, unsigned a_height, unsigned a_buffer_size)
 {
-  //printf("Resize request: %u %u %u\n", a_width, a_height, a_buffer_size);
   // If the dimensions don't change, leave this alone
   if (a_width == width && height == a_height && buffer_size == a_buffer_size)
     return;
 
-  std::deque< Row > new_rows;
-  //printf("Resizing from %u %u %u\n", width, height, buffer_size);
+  Row *new_rows = new Row[a_height + a_buffer_size];
+
   for (int i = -a_buffer_size; i < (int)a_height; ++i)
     {
-      Row row = is_valid_row_value(i) ? rows[i + buffer_size] : Row();
-      row.set_width(a_width);
+      // Copy lines from the original
+      if (i >= -(int)buffer_size && i < (int)height)
+        new_rows[i + a_buffer_size] = rows[i + buffer_size];
 
-      new_rows.push_back(row);
+      new_rows[i + a_buffer_size].set_width(a_width);
     }
 
   height = a_height;
   width = a_width;
   buffer_size = a_buffer_size;
 
+  delete [] rows;
   rows = new_rows;
 }

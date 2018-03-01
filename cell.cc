@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "putty/cell.hh"
-#include <stdio.h>
 
 using namespace Putty;
 
@@ -17,69 +16,30 @@ const Cell::Color Cell::DefaultBackground = 256 + Cell::DEFAULT_BACKGROUND;
 const Cell::Attributes Cell::DefaultAttributes = (Cell::DefaultForeground << Cell::FgColorShift) |
     (Cell::DefaultBackground << Cell::BgColorShift);
 
-
 Cell::Cell()
-  : attr(Cell::DefaultAttributes),
-    changed(true)
-{
-  set_changed(true);
-}
+{}
 
 Cell::Cell(const std::wstring &characters, Attributes attr)
-  : changed(true)
 {
   set(characters, attr);
-  set_changed(true);
 }
 
 Cell::Cell(const Cell &other)
   : characters(other.characters),
-    attr(other.attr),
-    changed(other.changed)
-{
-}
+    attr(other.attr)
+{}
 
 Cell &
 Cell::operator=(const Cell &other)
 {
   characters = other.characters;
   attr = other.attr;
-  changed = other.changed;
   return *this;
 }
 
 void
 Cell::set(const std::wstring &characters, Attributes attr)
 {
-  set_characters(characters);
-  set_attributes(attr);
-}
-
-void
-Cell::set_characters(const std::wstring &characters)
-{
-  if (get_characters() != characters)
-    {
-      set_changed(true);
-    }
-
   this->characters = characters;
-}
-
-void
-Cell::set_attributes(Cell::Attributes attributes)
-{
-  this->attr = attributes & ValidMask;
-}
-
-void
-Cell::set_changed(bool is_changed)
-{
-  changed = is_changed;
-}
-
-bool
-Cell::is_changed() const
-{
-  return changed;
+  this->attr = attr & ValidMask;
 }

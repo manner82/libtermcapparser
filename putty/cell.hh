@@ -18,7 +18,7 @@ namespace Putty
    */
   class Cell
   {
-    //friend class Row;
+    friend class Row;
 
   public:
     /**
@@ -103,9 +103,12 @@ namespace Putty
     Cell(const Cell &other);
 
     /**
-     * Construct an empty cell. The empty cell is invalid.
+     * Assign another cell to this cell.
+     *
+     * @param other Other cell.
+     * @return Reference to this cell.
      */
-    Cell();
+    Cell &operator=(const Cell &other);
 
     /** Get cell characters and its combining characters. */
     inline const std::wstring& get_characters() const
@@ -123,14 +126,6 @@ namespace Putty
 
       return characters[0];
     }
-
-    /**
-     * Assign another cell to this cell.
-     *
-     * @param other Other cell.
-     * @return Reference to this cell.
-     */
-    Cell &operator=(const Cell &other);
 
     /** Get cell character attributes. */
     inline Attributes get_attributes() const
@@ -170,12 +165,9 @@ namespace Putty
 
   protected:
     /**
-     * Set cell values.
-     *
-     * @param characters This wstring contains the character, and its combining characters
-     * @param attr Character attributes of the cell.
-     * @param combining_chrs List of the combining characters of chr.
+     * Construct an empty cell. The empty cell is invalid.
      */
+    Cell();
 
     /**
      * Create a cell with the character and attributes set
@@ -186,26 +178,27 @@ namespace Putty
      */
     Cell(const std::wstring &characters, Attributes attr);
 
-
+    /**
+     * Set cell values.
+     *
+     * @param characters This wstring contains the character, and its combining characters
+     * @param attr Character attributes of the cell.
+     * @param combining_chrs List of the combining characters of chr.
+     */
 public:
     void set(const std::wstring &characters, Attributes attr);
 
-    void set_characters(const std::wstring& characters);
+    void set_characters(const std::wstring& characters)
+    { this->characters = characters; }
 
-    void set_attributes(Attributes attributes);
-
-    void set_changed(bool is_changed);
-
-    bool is_changed() const;
+    void set_attributes(Attributes attributes)
+    { this->attr = attributes & ValidMask; }
 
   private:
     /** Character value of the cell. */
     std::wstring characters;
     /** Attribute value of the cell. */
     Attributes attr;
-
-  public:
-    bool changed;
   };
 
 } // namespace Putty

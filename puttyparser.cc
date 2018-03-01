@@ -230,13 +230,6 @@ void free_ctx(Context ctx)
 {
 }
 
-void
-do_scroll(Context ctx, int topline, int bottomline, int lines)
-{
-  struct gui_data *inst = (struct gui_data *)ctx;
-  inst->parser->scroll(topline, bottomline, lines);
-}
-
 void do_text(Context ctx, int x, int y, wchar_t *text, int len,
              unsigned long attr, int lattr)
 {

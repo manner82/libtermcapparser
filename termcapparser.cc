@@ -60,33 +60,70 @@ namespace
     return false;
   }
 
-  inline void move_on(const char *&data, int &size, int offset)
-  {
-    data = data + offset;
-    size -= offset;
-  }
-
-  inline bool is_control_sequence_partial(int data_length)
-  {
-    return data_length < CONTROL_SEQUENCE_LENGTH;
-  }
-
-  inline int get_first_control_sequence_pos(const char *data, int len)
-  {
-    int check_length = len - 1;
-    for (int pos = 0; pos < check_length; ++pos)
+  /**
+   * Helper class for changing the value of a variable temporarily (just for the given scope)
+   * in an exception-safe manner. When the destructor is called (when exiting the scope), the
+   * value is re-set to its old value.
+   */
+  template < typename _Type >
+    class TemporalValueChange
+    {
+    public:
+      /**
+       * Initialize helper object. The reference value is changed to the new value.
+       *
+       * @param ref Reference to variable to change.
+       * @param value New value of the variable.
+       */
+      TemporalValueChange(_Type &ref, const _Type &value)
+        : ref(ref),
+          oldval(ref)
       {
-        if ((data[pos] == ESCAPE_CHAR) && (data[pos + 1] == 'P'))
-          {
-            return pos;
-          }
+        ref = value;
       }
-    return -1;
-  }
+
+      /**
+       * Destroy the helper object. The referenced variable is set to its old value.
+       */
+      ~TemporalValueChange()
+      {
+        ref = oldval;
+      }
+
+    private:
+      _Type &ref;     /**< Variable reference */
+      _Type oldval;   /**< Old value of the variable (before change) */
+    };
+
+
+    inline void move_on(const char *&data, int &size, int offset)
+    {
+      data = data + offset;
+      size -= offset;
+    }
+
+    inline bool is_control_sequence_partial(int data_length)
+    {
+      return data_length < CONTROL_SEQUENCE_LENGTH;
+    }
+
+    inline int get_first_control_sequence_pos(const char *data, int len)
+    {
+      int check_length = len - 1;
+      for (int pos = 0; pos < check_length; ++pos)
+        {
+          if ((data[pos] == ESCAPE_CHAR) && (data[pos + 1] == 'P'))
+            {
+              return pos;
+            }
+        }
+      return -1;
+    }
 }
 
 TermcapParser::TermcapParser(const char *charset, int terminal_buffer_height)
-  : terminal_buffer_height(terminal_buffer_height),
+  : enable_update_display(true),
+    terminal_buffer_height(terminal_buffer_height),
     log_callback(0)
 {
   /* Create an instance structure and initialise to zeroes */
@@ -298,7 +335,6 @@ TermcapParser::get_state() const
   /* update terminal display buffer */
   term_update(inst->term);
 
-#if 1
   {
     /* write buffer content */
     int offset;
@@ -309,7 +345,6 @@ TermcapParser::get_state() const
     /* write remainder buffer content which is less than a complete terminal screen */
     copy_term_content_to_cache(offset, -offset);
   }
-#endif
 
   state.set_cursor(inst->term->cursor_on == 1, inst->term->curs.x, inst->term->curs.y);
 
@@ -339,6 +374,9 @@ TermcapParser::clear_buffer()
 void
 TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned long attr, long lattr)
 {
+  if (!enable_update_display)
+    return;
+
   std::wstring chr;
   Row *row = state.get_row_internal(y);
   if (!row)
@@ -354,7 +392,7 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
     {
       if (it != str.begin() && !is_combining_character(*it))
         {
-          row->set_cell(x, chr, attr);
+          set_cell(y, x, chr, attr);
           ++x;
           chr.clear();
         }
@@ -362,16 +400,7 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
     }
 
   if (!chr.empty())
-    {
-      row->set_cell(x, chr, attr);
-    }
-}
-
-void
-TermcapParser::scroll(int topline, int bottomline, int lines)
-{
-  //printf("XXX scroll request %d %d %d\n", topline, bottomline, lines);
-  state.scroll(lines);
+    set_cell(y, x, chr, attr);
 }
 
 void

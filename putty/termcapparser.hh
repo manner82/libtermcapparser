@@ -107,8 +107,6 @@ namespace Putty
      */
     void update_display(int x, int y, const std::wstring &str, unsigned long attr, long lattr);
 
-    void scroll(int topline, int bottomline, int lines);
-
     /**
      * Change the log callback function.
      *
@@ -158,6 +156,7 @@ namespace Putty
 
     Palette palette;                      /**< Currently used palette */
 
+    mutable bool enable_update_display;   /**< Enable/disable updating the display with update_display */
     int terminal_buffer_height;           /**< Terminal buffer height */
     LogCallback log_callback;             /**< Log callback function */
 
