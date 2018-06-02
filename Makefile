@@ -12,6 +12,9 @@ win32-%:
 linux-%:
 	$(MAKE) $(MFLAGS) -f Makefile.linux $*
 
+darwin-%:
+	$(MAKE) $(MFLAGS) -f Makefile.darwin $*
+
 clean: linux-clean win32-clean
 
 distclean: linux-distclean win32-distclean
