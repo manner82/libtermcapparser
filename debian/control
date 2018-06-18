@@ -20,3 +20,10 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, libtermcapparser (= ${binary:Versio
 Suggests:
 Provides:
 Description: The libtermcapparser dev package for ADP
+
+Package: libtermcapparser-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Depends: libtermcapparser (= ${binary:Version}), ${misc:Depends}
+Description: The libtermcapparser for ADP - debugging symbols.

@@ -31,7 +31,7 @@ binary-libtermcapparser: build
 	dh_installchangelogs
 	dh_makeshlibs
 	dh_shlibdeps
-	dh_strip
+	dh_strip -plibtermcapparser --dbg-package=libtermcapparser-dbg
 	dh_compress
 	dh_fixperms
 
