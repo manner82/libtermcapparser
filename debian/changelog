@@ -1,3 +1,9 @@
+libtermcapparser (1.0.13) xenial; urgency=low
+
+  * version bump
+
+ -- Tamas Domok <tamas.domok@oneidentity.com>  Tue, 24 Jun 2018 16:00:00 +0000
+
 libtermcapparser (1.0.12) xenial; urgency=low
 
   * Added debug package
