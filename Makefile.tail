@@ -18,7 +18,7 @@ install: $(TARGET)
 	mkdir -p $(DESTDIR)$(libdir)
 	mkdir -p $(DESTDIR)$(incdir)/$(HEADER_DIR)
 	$(INSTALL) -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(TARGET)
-	$(INSTALL) -m 644 $(HEADERS) -t $(DESTDIR)$(incdir)/$(HEADER_DIR)
+	$(INSTALL) -m 644 $(HEADERS) $(DESTDIR)$(incdir)/$(HEADER_DIR)
 
 uninstall:
 	rm -f $(DESTDIR)$(libdir)/$(TARGET)

@@ -1,0 +1,11 @@
+include Makefile.head
+
+TARGET_OS=darwin
+
+CFLAGS = $(CFLAGS_COMMON) -I./unix -fPIC
+
+TARGET=libtermcapparser.dylib
+
+C_OBJS = $(C_OBJS_COMMON) unix/uxmisc.c unix/uxucs.c
+
+include Makefile.tail
